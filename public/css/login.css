@@ -1,0 +1,38 @@
+.login-box {
+    margin-top: -100px !important;
+    height: auto;
+    box-shadow: -10px 20px 10px 5px black;
+}
+
+.card {
+    margin-bottom: 0px;
+}
+
+.login-card-body .input-group-text {
+    color: white !important;
+}
+
+.input-group-text {
+    color: black !important;
+}
+
+.login-logo a {
+    color: white;
+    font-weight: bold;
+}
+
+.login-logo img {
+    height: 150px;
+    width: 90%;
+    max-width: 100%;
+}
+
+.invalid-feedback{
+    color:rgb(250, 174, 174);
+}
+
+.acciones button,
+.acciones a {
+    margin-bottom: 5px;
+    width: 100%;
+}

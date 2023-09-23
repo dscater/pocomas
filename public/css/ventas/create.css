@@ -1,0 +1,161 @@
+#nuevoCliente {
+    cursor: pointer;
+}
+
+.totales td {
+    padding: 0px;
+    vertical-align: middle;
+}
+
+.quitar span {
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1.3em;
+    background: #dc3545;
+    height: 25px;
+    width: 25px;
+    display: flex;
+    border: solid 1px #e7061d;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}
+
+.fila td {
+    vertical-align: middle;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.fila td:nth-child(6) {
+    padding: 0px;
+}
+
+.group_info {
+    background-color: rgb(196, 255, 204);
+}
+.group_producto {
+    background-color: rgb(203, 222, 250);
+}
+.group_carrito {
+    background-color: rgba(255, 206, 206, 0.952);
+}
+.group_info label,
+.group_producto label,
+.group_carrito label {
+    color: black;
+}
+
+.tabla_venta {
+    background: white;
+    margin-bottom: 0px;
+}
+
+.tabla_venta tfoot tr td {
+    vertical-align: middle;
+}
+
+.tabla_venta tbody tr td input,
+.tabla_venta tfoot tr td input {
+    border-radius: 0px;
+}
+
+@media (max-width: 800px) {
+    .tabla_venta {
+        width: 100%;
+        border: none;
+    }
+    .tabla_venta tbody {
+        border-bottom: 10px solid transparent;
+    }
+
+    .tabla_venta tfoot {
+        display: flex;
+        flex-direction: column;
+        margin-top: 0px;
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .vacio {
+        font-size: 1.5em;
+    }
+
+    .vacio td {
+        padding: 10px !important;
+        text-align: center;
+    }
+    .tabla_venta thead {
+        display: none;
+    }
+
+    .tabla_venta tbody tr:nth-child(odd) {
+        background-color: rgb(241, 241, 241);
+    }
+
+    .tabla_venta tbody tr td,
+    .tabla_venta tfoot tr td {
+        height: 42px;
+        display: flex;
+        padding: 0px;
+        align-items: center;
+    }
+
+    .tabla_venta tfoot tr td {
+        border: none;
+    }
+
+    .tabla_venta tbody tr td input {
+        font-size: 0.95em;
+        height: 27px;
+        width: calc(100% - 100px) !important;
+        border-radius: 0px;
+    }
+
+    .tabla_venta tfoot tr td,
+    .tabla_venta tfoot tr td input {
+        font-size: 0.95em;
+        border-radius: 0px;
+    }
+    .tabla_venta tfoot tr td input {
+        width: calc(100% - 100px) !important;
+    }
+
+    .tabla_venta tbody tr td::before,
+    .tabla_venta tfoot tr td::before {
+        content: attr(data-col);
+        width: 100px !important;
+        font-weight: bold;
+    }
+
+    .tabla_venta tbody tr.vacio {
+        background-color: white;
+    }
+
+    .tabla_venta tbody tr.vacio td:before {
+        content: none;
+    }
+
+    .tabla_venta tfoot tr.totales {
+        color: white;
+    }
+
+    .tabla_venta tfoot tr.totales td:nth-child(1),
+    .tabla_venta tfoot tr.totales td:nth-child(3),
+    .tabla_venta tfoot tr.totales td:nth-child(5),
+    .tabla_venta tfoot tr.totales td:nth-child(8) {
+        display: none;
+    }
+
+    .tabla_venta tfoot tr:nth-child(2) td:nth-child(1),
+    .tabla_venta tfoot tr:nth-child(2) td:nth-child(3),
+    .tabla_venta tfoot tr:nth-child(3) td:nth-child(1),
+    .tabla_venta tfoot tr:nth-child(3) td:nth-child(3) {
+        display: none;
+    }
+
+    .oculto_cel {
+        display: none;
+    }
+}

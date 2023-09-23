@@ -1,0 +1,8 @@
+#contenedor_cuentas {
+    overflow: auto;
+    height: auto;
+}
+
+.check_header{
+    cursor: pointer;
+}
