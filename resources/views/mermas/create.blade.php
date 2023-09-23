@@ -46,7 +46,7 @@
             <!-- /.row -->
         </div>
     </section>
-    <input type="hidden" value="{{ route('ingreso_productos.getProductosLote') }}" id="url_productos_lote">
+    <input type="hidden" value="{{ route('ingreso_productos.getProductosLote') }}?stock=true" id="url_productos_lote">
 @endsection
 @section('scripts')
     <script>

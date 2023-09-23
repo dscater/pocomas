@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost:3306
--- Tiempo de generación: 23-09-2023 a las 14:23:55
+-- Tiempo de generación: 23-09-2023 a las 18:31:27
 -- Versión del servidor: 8.0.30
 -- Versión de PHP: 7.4.19
 
@@ -57,6 +57,7 @@ CREATE TABLE `caja_centrals` (
   `fecha` date NOT NULL,
   `monto` decimal(24,2) NOT NULL,
   `concepto_id` bigint UNSIGNED NOT NULL,
+  `ingreso_producto_id` bigint UNSIGNED DEFAULT '0',
   `cuenta_pagar_id` bigint UNSIGNED DEFAULT NULL,
   `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tipo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -119,8 +120,7 @@ INSERT INTO `clientes` (`id`, `nombre`, `ci`, `razon_social`, `email`, `celular`
 (6, 'MARIA MARTINEZ SAUCEDO', '343', '', '', '666666', '2023-08-18', 1, '2023-08-18 18:37:36', '2023-08-18 18:37:36'),
 (7, 'MARCO SOLIZ', '777', NULL, '', '666666', '2023-09-12', 1, '2023-09-12 18:59:49', '2023-09-12 18:59:49'),
 (8, 'JIMENA MAMANI', '888', NULL, '', '888888', '2023-09-12', 1, '2023-09-12 19:02:56', '2023-09-12 19:02:56'),
-(9, 'RUBEN MARTINES', '999', NULL, '', '78787878', '2023-09-12', 1, '2023-09-12 19:05:26', '2023-09-12 19:05:26'),
-(10, '', '444', NULL, '', '', '2023-09-18', 1, '2023-09-18 16:22:42', '2023-09-18 16:22:42');
+(9, 'RUBEN MARTINES', '999', NULL, '', '78787878', '2023-09-12', 1, '2023-09-12 19:05:26', '2023-09-12 19:05:26');
 
 -- --------------------------------------------------------
 
@@ -297,11 +297,11 @@ CREATE TABLE `detalle_ingresos` (
   `producto_id` bigint UNSIGNED NOT NULL,
   `kilos` double NOT NULL,
   `cantidad` double NOT NULL,
-  `tipo_control` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `stock_kilos` double NOT NULL,
   `stock_cantidad` double NOT NULL,
   `precio_compra` decimal(24,2) NOT NULL,
-  `anticipo` int NOT NULL,
+  `anticipo` double NOT NULL,
+  `anticipo_kilos` double NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -468,8 +468,9 @@ CREATE TABLE `kardex_productos` (
 
 CREATE TABLE `mermas` (
   `id` bigint UNSIGNED NOT NULL,
-  `producto_id` bigint UNSIGNED NOT NULL,
+  `detalle_ingreso_id` bigint UNSIGNED NOT NULL,
   `fecha` date NOT NULL,
+  `cantidad_kilos` double NOT NULL,
   `cantidad` double NOT NULL,
   `porcentaje` double(8,2) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -517,9 +518,9 @@ CREATE TABLE `productos` (
   `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `descripcion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `precio` decimal(24,2) NOT NULL,
-  `medida` varchar(155) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `stock_minimo` double NOT NULL,
   `stock_actual` double NOT NULL,
+  `stock_actual_cantidad` double NOT NULL,
   `estado` varchar(155) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `foto` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `prioridad` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -533,11 +534,12 @@ CREATE TABLE `productos` (
 -- Volcado de datos para la tabla `productos`
 --
 
-INSERT INTO `productos` (`id`, `codigo`, `nombre`, `descripcion`, `precio`, `medida`, `stock_minimo`, `stock_actual`, `estado`, `foto`, `prioridad`, `fecha_registro`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'P001', 'PRODUCTO 1', '', 25.00, 'KILOS', 10, 171.7, 'ACTIVO', 'producto_default.png', 'NORMAL', '2022-11-26', 1, '2022-11-26 12:49:24', '2023-09-18 16:22:05'),
-(2, 'P002', 'PRODUCTO 2', '', 35.00, 'KILOS', 10, 200, 'ACTIVO', 'producto_default.png', 'PRINCIPAL', '2022-11-26', 1, '2022-11-26 12:54:45', '2023-09-08 22:27:58'),
-(3, 'P002', 'PRODUCTO 3', '', 100.00, 'UNIDAD', 20, 0, 'ACTIVO', 'producto_default.png', 'NORMAL', '2023-08-10', 1, '2023-08-11 01:06:13', '2023-09-02 15:48:27'),
-(4, 'P004', 'PRODUCTO 4', 'P# 4', 35.00, 'KILOS', 20, 0, 'ACTIVO', 'producto_default.png', 'DEL PRINCIPAL', '2023-09-02', 1, '2023-09-02 15:39:12', '2023-09-05 20:05:14');
+INSERT INTO `productos` (`id`, `codigo`, `nombre`, `descripcion`, `precio`, `stock_minimo`, `stock_actual`, `stock_actual_cantidad`, `estado`, `foto`, `prioridad`, `fecha_registro`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'P001', 'PRODUCTO 1', '', 25.00, 10, 0, 0, 'ACTIVO', 'producto_default.png', 'NORMAL', '2022-11-26', 1, '2022-11-26 12:49:24', '2023-09-23 16:58:10'),
+(2, 'P002', 'PRODUCTO 2', '', 35.00, 10, 0, 0, 'ACTIVO', 'producto_default.png', 'PRINCIPAL', '2022-11-26', 1, '2022-11-26 12:54:45', '2023-09-23 18:28:03'),
+(3, 'P002', 'PRODUCTO 3', '', 100.00, 20, 0, 0, 'ACTIVO', 'producto_default.png', 'NORMAL', '2023-08-10', 1, '2023-08-11 01:06:13', '2023-09-23 16:58:41'),
+(4, 'P004', 'PRODUCTO 4', 'P# 4', 35.00, 20, 0, 0, 'ACTIVO', 'producto_default.png', 'DEL PRINCIPAL', '2023-09-02', 1, '2023-09-02 15:39:12', '2023-09-23 18:14:41'),
+(5, 'P005', 'PRODUCTO 5', 'DESC. PROD #5', 45.00, 5, 0, 0, 'ACTIVO', 'producto_default.png', 'NORMAL', '2023-09-23', 1, '2023-09-23 18:12:41', '2023-09-23 18:28:03');
 
 -- --------------------------------------------------------
 
@@ -615,15 +617,6 @@ CREATE TABLE `sesion_users` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `sesion_users`
---
-
-INSERT INTO `sesion_users` (`id`, `user_id`, `navegador`, `dispositivo`, `sistema`, `detalle`, `estado`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Chrome', 'Unknown', 'Windows', 'Chrome / Windows', 1, '2023-09-08 22:17:19', '2023-09-23 14:23:39'),
-(2, 2, 'Chrome', 'Unknown', 'Windows', 'Chrome / Windows', 1, '2023-09-08 22:28:06', '2023-09-18 16:27:12'),
-(3, 3, 'Chrome', 'Unknown', 'Windows', 'Chrome / Windows', 1, '2023-09-08 22:32:12', '2023-09-08 22:33:13');
-
 -- --------------------------------------------------------
 
 --
@@ -685,6 +678,7 @@ CREATE TABLE `ventas` (
   `caja_id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
   `cliente_id` bigint UNSIGNED NOT NULL,
+  `cantidad_total_kilos` double NOT NULL,
   `cantidad_total` double NOT NULL,
   `anticipo` decimal(24,2) NOT NULL,
   `saldo` decimal(24,2) NOT NULL,
@@ -710,8 +704,8 @@ CREATE TABLE `venta_detalles` (
   `id` bigint UNSIGNED NOT NULL,
   `venta_id` bigint UNSIGNED NOT NULL,
   `producto_id` bigint UNSIGNED NOT NULL,
-  `detalle_ingreso_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `lotes_cantidades` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `detalle_ingreso_id` bigint UNSIGNED NOT NULL,
+  `cantidad_kilos` double NOT NULL,
   `cantidad` double NOT NULL,
   `monto` decimal(24,2) NOT NULL,
   `descuento` decimal(24,2) NOT NULL,
@@ -1062,7 +1056,7 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT de la tabla `productos`
 --
 ALTER TABLE `productos`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `proveedors`
@@ -1080,7 +1074,7 @@ ALTER TABLE `razon_socials`
 -- AUTO_INCREMENT de la tabla `sesion_users`
 --
 ALTER TABLE `sesion_users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `users`

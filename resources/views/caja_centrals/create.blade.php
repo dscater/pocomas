@@ -46,13 +46,25 @@
             <!-- /.row -->
         </div>
     </section>
-    @php
-        $script = '<script type="text/javascript">
-            window.onload = function() {};
-        </script>';
-    @endphp
-    {!! $script !!}
-@section('scripts')
 @endsection
 
+@section('scripts')
+    <script>
+        let concepto_id = $("#concepto_id");
+        let ingreso_producto_id = $("#ingreso_producto_id");
+        $(document).ready(function() {
+            verificaConcepto();
+            concepto_id.change(verificaConcepto)
+        });
+
+        function verificaConcepto() {
+            if (concepto_id.val() == 0 && concepto_id.val() != "") {
+                ingreso_producto_id.parents(".contenedor_lote").removeClass("oculto");
+                ingreso_producto_id.prop("required", true);
+            } else {
+                ingreso_producto_id.parents(".contenedor_lote").addClass("oculto");
+                ingreso_producto_id.removeAttr("required");
+            }
+        }
+    </script>
 @endsection

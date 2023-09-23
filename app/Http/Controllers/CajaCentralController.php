@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\CajaCentral;
 use App\Concepto;
+use App\IngresoProducto;
 use Illuminate\Http\Request;
 
 class CajaCentralController extends Controller
@@ -21,10 +22,18 @@ class CajaCentralController extends Controller
     {
         $conceptos = Concepto::all();
         $array_conceptos[""] = "Seleccione...";
+        $array_conceptos[0] = "LOTE";
         foreach ($conceptos as $value) {
             $array_conceptos[$value->id] = $value->nombre;
         }
-        return view("caja_centrals.create", compact("array_conceptos"));
+
+        $lotes = IngresoProducto::where("estado", 1)->get();
+        $array_lotes[""] = "Seleccione...";
+        foreach ($lotes as $value) {
+            $array_lotes[$value->id] = $value->nro_lote;
+        }
+
+        return view("caja_centrals.create", compact("array_conceptos", "array_lotes"));
     }
 
     public function store(Request $request)
@@ -41,6 +50,11 @@ class CajaCentralController extends Controller
             }
         }
         $request["fecha_registro"] = date("Y-m-d");
+
+        if ($request->concepto_id != 0) {
+            $request["ingreso_producto_id"] = 0;
+        }
+
         CajaCentral::create(array_map("mb_strtoupper", $request->all()));
         return redirect()->route('caja_centrals.index')->with('bien', 'Registro realizado con éxito');
     }
@@ -49,10 +63,17 @@ class CajaCentralController extends Controller
     {
         $conceptos = Concepto::all();
         $array_conceptos[""] = "Seleccione...";
+        $array_conceptos[0] = "LOTE";
         foreach ($conceptos as $value) {
             $array_conceptos[$value->id] = $value->nombre;
         }
-        return view("caja_centrals.edit", compact("caja_central", "array_conceptos"));
+
+        $lotes = IngresoProducto::where("estado", 1)->get();
+        $array_lotes[""] = "Seleccione...";
+        foreach ($lotes as $value) {
+            $array_lotes[$value->id] = $value->nro_lote;
+        }
+        return view("caja_centrals.edit", compact("caja_central", "array_conceptos", "array_lotes"));
     }
     public function update(CajaCentral $caja_central, Request $request)
     {

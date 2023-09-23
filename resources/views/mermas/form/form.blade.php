@@ -1,32 +1,32 @@
 <div class="row">
-    {{-- <div class="col-md-4">
+    <div class="col-md-2">
         <div class="form-group">
-            <label>Nro. de lote*</label>
-            {{ Form::select('ingreso_producto_id', $array_ingreso_productos, null, ['class' => 'form-control', 'required', 'id' => 'ingreso_producto_id']) }}
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="form-group">
-            <label>Seleccionar producto*</label>
-            {{ Form::select('detalle_ingreso_id', [], isset($merma) ? $merma->detalle_ingreso_id : null, ['class' => 'form-control', 'required', 'id' => 'detalle_ingreso_id']) }}
-        </div>
-    </div> --}}
-    <div class="col-md-4">
-        <div class="form-group">
-            <label>Fecha*</label>
-            {{ Form::date('fecha', isset($merma) ? $merma->fecha : date('Y-m-d'), ['class' => 'form-control', 'required']) }}
+            <label>Lote*</label>
+            {{ Form::select('ingreso_producto_id', $array_lotes, isset($merma) ? $merma->detalle_ingreso->ingreso_producto->id : null, ['class' => 'form-control select2', 'id' => 'ingreso_producto_id']) }}
         </div>
     </div>
     <div class="col-md-4">
         <div class="form-group">
             <label>Producto*</label>
-            {{ Form::select('producto_id', $array_productos, null, ['class' => 'form-control select2', 'id' => 'select_producto', 'required']) }}
+            {{ Form::select('detalle_ingreso_id', [], null, ['class' => 'form-control select2', 'id' => 'detalle_ingreso_id', 'required']) }}
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-2">
         <div class="form-group">
-            <label>Cantidad*</label>
+            <label>Cantidad de kilos*</label>
+            {{ Form::number('cantidad_kilos', null, ['class' => 'form-control', 'required', 'step' => '0.01', 'min' => '0', 'id' => 'cantidad_kilos']) }}
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            <label>Cantidad de cerdo*</label>
             {{ Form::number('cantidad', null, ['class' => 'form-control', 'required', 'step' => '0.01', 'min' => '0', 'id' => 'cantidad']) }}
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            <label>Fecha*</label>
+            {{ Form::date('fecha', isset($merma) ? $merma->fecha : date('Y-m-d'), ['class' => 'form-control', 'required']) }}
         </div>
     </div>
 </div>

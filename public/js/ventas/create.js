@@ -9,12 +9,15 @@ let fila = `<tr class="fila">
                     <input type="hidden" name="costos[]" value="0" />
                     <span class="valor"></span>
                 </td>
-                <td data-col="Cantidad:">
-                    <input type="hidden" name="cantidad_lotes[]" value="0" />
+                <td data-col="Cantidad Kilos:">
+                    <input type="hidden" name="cantidad_kilos[]" value="0" />
+                    <span class="valor"></span>
+                </td>
+                <td data-col="Cantidad Cerdos:">
                     <input type="hidden" name="cantidads[]" value="0" />
                     <span class="valor"></span>
                 </td>
-                <td class="txt_total_sd" data-col="Total S/D:">
+                <td class="txt_total_sd text-center" data-col="Total S/D:">
                     <span class="valor"></span>
                 </td>
                 <td clasS="descuento" data-col="Descuento:">
@@ -38,7 +41,9 @@ let totales = contenedorCarrito.siblings("tfoot").children("tr.totales");
 let btnBuscaCliente = $("#btnBuscaCliente");
 let cliente_id = $("#cliente_id");
 let input_cliente = $("#input_cliente");
+let select_ingreso_producto = $("#select_ingreso_producto");
 let select_producto = $("#select_producto");
+let input_cantidad_kilos = $("#input_cantidad_kilos");
 let input_cantidad = $("#input_cantidad");
 
 let btnRegistraCliente = $("#btnRegistraCliente");
@@ -66,6 +71,22 @@ $(document).ready(function () {
 
     btnRegistraCliente.click(function () {
         registrarCliente();
+    });
+
+    select_ingreso_producto.change(function () {
+        if (select_ingreso_producto.val() != "") {
+            $.ajax({
+                type: "GET",
+                url: $("#urlProductosLote").val(),
+                data: { id: select_ingreso_producto.val() },
+                dataType: "json",
+                success: function (response) {
+                    select_producto.html(response);
+                },
+            });
+        } else {
+            select_producto.html("");
+        }
     });
 
     tipo_venta.change(function () {
@@ -97,12 +118,6 @@ $(document).ready(function () {
             anticipo.removeAttr("required");
             anticipo.parents(".contenedor_anticipo").addClass("oculto");
         }
-        // concepto_id.removeAttr("required");
-        // concepto_id.parents(".contenedor_concepto").addClass("oculto");
-        // if (tipo_venta.val() == "AL CONTADO" || tipo_venta.val() == "ANTICIPOS") {
-        //     concepto_id.prop("required", true);
-        //     concepto_id.parents(".contenedor_concepto").removeClass("oculto");
-        // }
     });
 
     anticipo.keyup(function () {
@@ -143,26 +158,12 @@ $(document).ready(function () {
         getInfoCliente("select");
     });
 
-    select_producto.change(function () {
-        if (select_producto.val() != "") {
-            $.ajax({
-                type: "GET",
-                url: $("#urlMedidaProducto").val(),
-                data: { producto_id: select_producto.val() },
-                dataType: "json",
-                success: function (response) {
-                    $("#lbl_cantidad").text(response.medida);
-                },
-            });
-        } else {
-            $("#lbl_cantidad").text("Cantidad*");
-        }
-    });
-
     btnAgregarProducto.click(function () {
         btnAgregarProducto.prop("disabled", true);
         if (
             select_producto.val() != "" &&
+            input_cantidad_kilos.val() != "" &&
+            input_cantidad_kilos.val() > 0 &&
             input_cantidad.val() != "" &&
             input_cantidad.val() > 0
         ) {
@@ -170,89 +171,102 @@ $(document).ready(function () {
                 type: "GET",
                 url: $("#urlInfoVenta").val(),
                 data: {
-                    producto_id: select_producto.val(),
+                    detalle_ingreso_id: select_producto.val(),
+                    cantidad_kilos: input_cantidad_kilos.val(),
                     cantidad: input_cantidad.val(),
                 },
                 dataType: "json",
                 success: function (response) {
                     if (response.sw) {
                         // CREAR FILAS DEACUERDO AL ARRAY OBTENIDO
-                        let string_ids = response.string_ids_lotes;
-                        let string_cantidades = response.array_lotes.cantidades;
                         let precio = response.precio;
-                        // for (let i = 0; i < ids.length; i++) {
+                        let producto = response.producto;
+                        let detalle_ingreso = response.detalle_ingreso;
                         let nueva_fila = $(fila).clone();
+
+                        // producto
                         nueva_fila
                             .children("td")
                             .eq(1)
                             .children("span")
-                            .text(response.producto.nombre);
+                            .text(producto.nombre);
+
                         nueva_fila
                             .children("td")
                             .eq(1)
                             .children("input")
                             .eq(0)
-                            .val(string_ids);
+                            .val(detalle_ingreso.id);
                         nueva_fila
                             .children("td")
                             .eq(1)
                             .children("input")
                             .eq(1)
-                            .val(response.producto.id);
+                            .val(producto.id);
 
+                        // precio
                         nueva_fila
                             .children("td")
                             .eq(2)
                             .children("span")
-                            .text(response.producto.precio);
+                            .text(producto.precio);
                         nueva_fila
                             .children("td")
                             .eq(2)
                             .children("input")
-                            .val(response.producto.precio);
+                            .val(producto.precio);
 
+                        // cantidad kilos
                         nueva_fila
                             .children("td")
                             .eq(3)
+                            .children("span")
+                            .text(input_cantidad_kilos.val());
+                        nueva_fila
+                            .children("td")
+                            .eq(3)
+                            .children("input")
+                            .eq(0)
+                            .val(input_cantidad_kilos.val());
+
+                        // cantidad cerdos
+                        nueva_fila
+                            .children("td")
+                            .eq(4)
                             .children("span")
                             .text(input_cantidad.val());
                         nueva_fila
                             .children("td")
-                            .eq(3)
+                            .eq(4)
                             .children("input")
                             .eq(0)
-                            .val(string_cantidades);
-                        nueva_fila
-                            .children("td")
-                            .eq(3)
-                            .children("input")
-                            .eq(1)
                             .val(input_cantidad.val());
 
                         // obtener el total S/D
                         let precio_total = (
                             parseFloat(precio) *
-                            parseFloat(input_cantidad.val())
+                            parseFloat(input_cantidad_kilos.val())
                         ).toFixed(2);
                         nueva_fila
                             .children("td")
-                            .eq(4)
+                            .eq(5)
                             .children("span")
                             .text(precio_total);
                         nueva_fila
                             .children("td")
-                            .eq(6)
+                            .eq(7)
                             .children("span")
                             .text(precio_total);
                         nueva_fila
                             .children("td")
-                            .eq(6)
+                            .eq(7)
                             .children("input")
                             .val(precio_total);
                         contenedorCarrito.append(nueva_fila);
-                        // }
+
                         ennumeraFilas();
 
+                        input_cantidad_kilos.val("");
                         input_cantidad.val("");
                         select_producto.val("");
                         select_producto.trigger("change");
@@ -262,7 +276,7 @@ $(document).ready(function () {
                         swal.fire({
                             title: "Error",
                             icon: "error",
-                            text: `${response.msg}`,
+                            html: `${response.msg}`,
                             confirmButtonText: "Aceptar",
                             confirmButtonColor: "#bd2130",
                         });
@@ -286,20 +300,20 @@ $(document).ready(function () {
             e.preventDefault();
             let fila = $(this).closest("tr.fila");
             let valor = $(this).val();
-            let total_sd = fila.children("td").eq(4).children("span").text();
+            let total_sd = fila.children("td").eq(5).children("span").text();
             if (valor != "") {
                 let total_cd = parseFloat(total_sd) - parseFloat(valor);
                 fila.children("td")
-                    .eq(6)
+                    .eq(7)
                     .children("span")
                     .text(total_cd.toFixed(2));
                 fila.children("td")
-                    .eq(6)
+                    .eq(7)
                     .children("input")
                     .val(total_cd.toFixed(2));
             } else {
-                fila.children("td").eq(6).children("span").text(total_sd);
-                fila.children("td").eq(6).children("input").val(total_sd);
+                fila.children("td").eq(7).children("span").text(total_sd);
+                fila.children("td").eq(7).children("input").val(total_sd);
             }
             ennumeraFilas();
         }
@@ -404,38 +418,66 @@ function ennumeraFilas() {
         _vacio.remove();
         let contador = 1;
         let total_monto = 0;
+        let total_cantidad_kilos = 0;
         let total_cantidad = 0;
+        let cant_kilos = 0;
         let cant = 0;
         let mon = 0;
         filas.each(function () {
             $(this).children("td").eq(0).text(contador);
-            cant = $(this).children("td").eq(3).children("input").eq(1).val();
-            mon = $(this).children("td").eq(6).children("input").val();
+            cant_kilos = $(this)
+                .children("td")
+                .eq(3)
+                .children("input")
+                .eq(0)
+                .val();
+            cant = $(this).children("td").eq(4).children("input").eq(0).val();
+            mon = $(this).children("td").eq(7).children("input").val();
+            total_cantidad_kilos += parseFloat(cant_kilos);
             total_cantidad += parseFloat(cant);
             total_monto += parseFloat(mon);
             contador++;
         });
 
+        total_cantidad_kilos = parseFloat(total_cantidad_kilos).toFixed(2);
         total_cantidad = parseFloat(total_cantidad).toFixed(2);
         total_monto = parseFloat(total_monto).toFixed(2);
+        // total kilos
         totales
             .children("td")
             .eq(1)
             .children("input")
             .eq(0)
-            .val(total_cantidad);
+            .val(total_cantidad_kilos);
         totales
             .children("td")
             .eq(1)
             .children("input")
             .eq(1)
+            .val(total_cantidad_kilos);
+
+        // total cantidad
+        totales
+            .children("td")
+            .eq(2)
+            .children("input")
+            .eq(0)
             .val(total_cantidad);
-        totales.children("td").eq(3).children("input").eq(0).val(total_monto);
-        totales.children("td").eq(3).children("input").eq(1).val(total_monto);
+        totales
+            .children("td")
+            .eq(2)
+            .children("input")
+            .eq(1)
+            .val(total_cantidad);
+
+        // total montos
+        totales.children("td").eq(4).children("input").eq(0).val(total_monto);
+        totales.children("td").eq(4).children("input").eq(1).val(total_monto);
         calculaCambio();
     } else {
         totales.children("td").eq(1).children("input").eq(0).val("0");
-        totales.children("td").eq(3).children("input").eq(0).val("0.00");
+        totales.children("td").eq(2).children("input").eq(0).val("0");
+        totales.children("td").eq(4).children("input").eq(0).val("0.00");
         btnRegistrarVenta.prop("disabled", true);
         if (_vacio.length == 0) {
             contenedorCarrito.html(vacio);

@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\DetalleIngreso;
 use App\IngresoProducto;
 use App\KardexProducto;
 use App\Merma;
 use App\Producto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MermaController extends Controller
 {
@@ -18,43 +20,41 @@ class MermaController extends Controller
 
     public function create()
     {
-        $ingreso_productos = IngresoProducto::where('estado', 1)->get();
-        $array_ingreso_productos[""] = "Seleccione...";
-        foreach ($ingreso_productos as $value) {
-            $array_ingreso_productos[$value->id] = $value->nro_lote;
-        }
-        $productos = Producto::where('status', 1)
-            ->where('estado', 'ACTIVO')
-            ->where('status', 1)
+        $lotes = IngresoProducto::where('estado', 1)
             ->get();
-        $array_productos[''] = "Seleccione...";
-        foreach ($productos as $value) {
-            $array_productos[$value->id] =  $value->nombre;
+        $array_lotes[''] = "Seleccione...";
+        foreach ($lotes as $value) {
+            $array_lotes[$value->id] =  $value->nro_lote;
         }
-        return view('mermas.create', compact("array_ingreso_productos", 'array_productos'));
+        return view('mermas.create', compact('array_lotes'));
     }
 
     public function store(Request $request)
     {
-        $producto = Producto::findOrFail($request->producto_id);
-        // $producto = Producto::where("prioridad", "PRINCIPAL")->where("status", 1)->where("estado", "ACTIVO")->get()->first();
-        // if (!$producto) {
-        //     return redirect()->route('mermas.index')->with('error', 'No se pudo registrar la merma debido a que no hay un producto PRINCIPAL');
-        // }
-        // if ($producto->stock_actual <= 0) {
-        //     return redirect()->route('mermas.index')->with('error', 'No se pudo registrar la merma debido a que el stock del producto PRINCIPAL es de 0');
-        // }
+        DB::beginTransaction();
+        try {
+            $detalle_ingreso = DetalleIngreso::findOrFail($request->detalle_ingreso_id);
+            $request["detalle_ingreso_id"] = $detalle_ingreso->id;
+            $request["porcentaje"] = ((float)$request->cantidad_kilos * 100) / $detalle_ingreso->stock_kilos;
 
-        $request["producto_id"] = $producto->id;
-        $request["porcentaje"] = ((float)$request->cantidad * 100) / $producto->stock_actual;
-
-        $merma = Merma::create(array_map('mb_strtoupper', $request->all()));
-        // stock del PRODUCTO
-        $producto->stock_actual = (float)$producto->stock_actual - (float)$merma->cantidad;
-        $producto->save();
-        // actualizar kardex
-        KardexProducto::registroEgreso($producto, $merma->cantidad, 0, "EGRESO DE PRODUCTO POR MERMA");
-        return redirect()->route('mermas.index')->with('bien', 'Registro realizado con éxito');
+            $merma = Merma::create(array_map('mb_strtoupper', $request->all()));
+            // stock del detalle
+            $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos - (float)$merma->cantidad_kilos;
+            $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad - (float)$merma->cantidad;
+            $detalle_ingreso->save();
+            // stock del producto
+            $producto = $detalle_ingreso->producto;
+            $producto->stock_actual = (float)$producto->stock_actual - (float)$merma->cantidad_kilos;
+            $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad - (float)$merma->cantidad;
+            $producto->save();
+            // actualizar kardex
+            KardexProducto::registroEgreso($producto, $merma->cantidad_kilos, 0, "EGRESO DE PRODUCTO POR MERMA");
+            DB::commit();
+            return redirect()->route('mermas.index')->with('bien', 'Registro realizado con éxito');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('mermas.index')->with('error', 'Ocurrió un error inesperado. ' . $e->getMessage());
+        }
     }
 
     public function nuevo_merma(Request $request)
@@ -73,35 +73,58 @@ class MermaController extends Controller
 
     public function edit(Merma $merma)
     {
-        $ingreso_productos = IngresoProducto::where('estado', 1)->get();
-        $array_ingreso_productos[""] = "Seleccione...";
-        foreach ($ingreso_productos as $value) {
-            $array_ingreso_productos[$value->id] = $value->nro_lote;
+        $lotes = IngresoProducto::where('estado', 1)
+            ->get();
+        $array_lotes[''] = "Seleccione...";
+        foreach ($lotes as $value) {
+            $array_lotes[$value->id] =  $value->nro_lote;
         }
-        return view('mermas.edit', compact('merma', 'array_ingreso_productos'));
+        return view('mermas.edit', compact('merma', 'array_lotes'));
     }
 
     public function update(Merma $merma, Request $request)
     {
-        if ($merma->cantidad != $request->cantidad) {
-            // REVERTIR MERMA
-            // stock del PRODUCTO
-            $producto = $merma->producto;
-            $producto->stock_actual = (float)$producto->stock_actual + (float)$merma->cantidad;
-            $producto->save();
-            // actualizar kardex
-            KardexProducto::registroSoloIngreso($producto, $merma->cantidad, 0, "INGRESO DE PRODUCTO POR ACTUALIZACIÓN DE REGISTRO MERMA");
+        if ($merma->cantidad != $request->cantidad || $merma->cantidad_kilos != $request->cantidad_kilos || $merma->detalle_ingreso_id != $request->detalle_ingreso_id) {
+            DB::beginTransaction();
+            try {
+                // REVERTIR MERMA
+                // stock del PRODUCTO
+                $producto = $merma->detalle_ingreso->producto;
+                $producto->stock_actual = (float)$producto->stock_actual + (float)$merma->cantidad_kilos;
+                $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad + (float)$merma->cantidad;
+                $producto->save();
+                // stock del detalle ingreso
+                $detalle_ingreso = $merma->detalle_ingreso;
+                $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos + (float)$merma->cantidad_kilos;
+                $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad + (float)$merma->cantidad;
+                $detalle_ingreso->save();
+                // actualizar kardex
+                KardexProducto::registroSoloIngreso($producto, $merma->cantidad_kilos, $detalle_ingreso->id, "INGRESO DE PRODUCTO POR ACTUALIZACIÓN DE REGISTRO MERMA");
 
-            $request["porcentaje"] = ((float)$request->cantidad * 100) / $producto->stock_actual;
-            $merma->update(array_map('mb_strtoupper', $request->all()));
+                $request["porcentaje"] = ((float)$request->cantidad_kilos * 100) / $producto->stock_actual;
+                $merma->update(array_map('mb_strtoupper', $request->all()));
 
-            // stock del PRODUCTO
-            $producto->stock_actual = (float)$producto->stock_actual - (float)$merma->cantidad;
-            $producto->save();
-            // actualizar kardex
-            KardexProducto::registroEgreso($producto, $merma->cantidad, 0, "EGRESO DE PRODUCTO POR MERMA");
+                $merma_actualizado = Merma::find($merma->id);
+                // stock del detalle ingreso
+                $detalle_ingreso = $merma_actualizado->detalle_ingreso;
+                $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos - (float)$merma->cantidad_kilos;
+                $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad - (float)$merma->cantidad;
+                $detalle_ingreso->save();
+
+                // stock del PRODUCTO
+                $producto = $merma_actualizado->detalle_ingreso->producto;
+                $producto->stock_actual = (float)$producto->stock_actual - (float)$merma->cantidad_kilos;
+                $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad - (float)$merma->cantidad;
+                $producto->save();
+                // actualizar kardex
+                KardexProducto::registroEgreso($producto, $merma->cantidad, $detalle_ingreso->id, "EGRESO DE PRODUCTO POR MERMA");
+                DB::commit();
+                return redirect()->route('mermas.index')->with('bien', 'Registro modificado con éxito');
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return redirect()->route('mermas.index')->with('error', 'Ocurrió un error inesperado. ' . $e->getMessage());
+            }
         }
-
         return redirect()->route('mermas.index')->with('bien', 'Registro modificado con éxito');
     }
 

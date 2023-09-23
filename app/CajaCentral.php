@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class CajaCentral extends Model
 {
     protected $fillable = [
-        'fecha', 'monto', 'descripcion', 'concepto_id', 'cuenta_pagar_id', 'tipo', 'sw_egreso', 'tipo_transaccion', 'fecha_registro',
+        'fecha', 'monto', 'descripcion', 'concepto_id', 'ingreso_producto_id', 'cuenta_pagar_id', 'tipo', 'sw_egreso', 'tipo_transaccion', 'fecha_registro',
     ];
 
     public static function getSaldo()
@@ -34,5 +34,10 @@ class CajaCentral extends Model
     public function concepto()
     {
         return $this->belongsTo(Concepto::class, 'concepto_id');
+    }
+
+    public function ingreso_producto()
+    {
+        return $this->belongsTo(IngresoProducto::class, 'ingreso_producto_id');
     }
 }

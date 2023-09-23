@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class VentaDetalle extends Model
 {
     protected $fillable = [
-        'venta_id', 'producto_id', "detalle_ingreso_id", "lotes_cantidades", 'cantidad', 'monto', 'descuento', 'sub_total',
+        'venta_id', 'producto_id', "detalle_ingreso_id", "cantidad_kilos", "cantidad", 'monto', 'descuento', 'sub_total',
     ];
 
     protected $appends = ["total_sd"];

@@ -35,8 +35,10 @@
                                 <thead>
                                     <tr>
                                         <th>Fecha</th>
+                                        <th>Nro. Lote</th>
                                         <th>Producto</th>
-                                        <th>Cantidad</th>
+                                        <th>Cantidad Kilos</th>
+                                        <th>Cantidad Cerdos</th>
                                         <th>Opciones</th>
                                     </tr>
                                 </thead>
@@ -47,7 +49,9 @@
                                     @foreach ($mermas as $merma)
                                         <tr>
                                             <td>{{ $merma->fecha }}</td>
-                                            <td>{{ $merma->producto->nombre }}</td>
+                                            <td>{{ $merma->detalle_ingreso->ingreso_producto->nro_lote }}</td>
+                                            <td>{{ $merma->detalle_ingreso->producto->nombre }}</td>
+                                            <td>{{ $merma->cantidad_kilos }}</td>
                                             <td>{{ $merma->cantidad }}</td>
                                             <td class="btns-opciones">
                                                 <a href="{{ route('mermas.edit', $merma->id) }}" class="modificar"><i
@@ -97,6 +101,8 @@
                 [0, 'desc']
             ],
             columns: [
+                null,
+                null,
                 null,
                 null,
                 null,

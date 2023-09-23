@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DetalleIngreso;
 use App\IngresoProducto;
 use Illuminate\Http\Request;
 use App\Producto;
@@ -31,6 +32,7 @@ class ProductoController extends Controller
 
         $request['fecha_registro'] = date('Y-m-d');
         $request['stock_actual'] = 0;
+        $request['stock_actual_cantidad'] = 0;
         $request['status'] = 1;
         $request['foto'] = '';
         $nuevo_producto = new Producto(array_map('mb_strtoupper', $request->except('foto')));
@@ -96,42 +98,32 @@ class ProductoController extends Controller
 
     public function getInfoVenta(Request $request)
     {
-        $producto_venta = Producto::find($request->producto_id);
-        $producto_info = Producto::find($request->producto_id);
-        $stock_actual = $producto_info->stock_actual;
-        if ($producto_info->prioridad == 'PRINCIPAL' || $producto_info->prioridad == 'DEL PRINCIPAL') {
-            $producto_info = Producto::where("prioridad", "PRINCIPAL")->where("status", 1)->get()->first();
-            if ($producto_info) {
-                $stock_actual = $producto_info->stock_actual;
-            }
-        }
+        $producto_venta = DetalleIngreso::find($request->detalle_ingreso_id);
+        $producto_info = DetalleIngreso::find($request->detalle_ingreso_id);
+        // stock disponible
+        $stock_kilos = $producto_info->stock_kilos;
+        $stock_cantidad = $producto_info->stock_cantidad;
+
+        // valores soliticados
         $cantidad = $request->cantidad;
+        $cantidad_kilos = $request->cantidad_kilos;
 
-        if ($stock_actual >= $cantidad) {
-            // $total = (float)$producto->precio * (int)$cantidad;
+        if ($stock_kilos >= $cantidad_kilos && $stock_cantidad > $cantidad) {
 
-            $array_lotes = IngresoProducto::getProductosLote($producto_info->id, $cantidad);
+            // $producto_info->stock_kilos -= (float)$cantidad_kilos;
+            // $producto_info->stock_cantidad -= (float)$stock_cantidad;
+            // $producto_info->save();
 
-            if (count($array_lotes["ids"]) > 0) {
-                return response()->JSON([
-                    'sw' => true,
-                    // 'total' => $total,
-                    'array_lotes' => $array_lotes,
-                    'string_ids_lotes' => implode(",", $array_lotes["ids"]),
-                    'string_cantidad_lotes' => implode(",", $array_lotes["cantidades"]),
-                    'producto' => $producto_venta,
-                    'precio' => $producto_venta->precio
-                ]);
-            } else {
-                return response()->JSON([
-                    'sw' => false,
-                    'msg' => 'El stock de lotes no es suficiente para la cantidad requerida',
-                ]);
-            }
+            return response()->JSON([
+                'sw' => true,
+                'detalle_ingreso' => $producto_info,
+                'producto' => $producto_venta->producto,
+                'precio' => $producto_venta->producto->precio
+            ]);
         } else {
             return response()->JSON([
                 'sw' => false,
-                'msg' => 'El stock actual del producto es de ' . $stock_actual . ', insuficiente para la cantidad que seleccionó',
+                'msg' => 'El stock actual en el lote del producto que seleccionó es de:<br> <p class="text-center mb-1"><strong>' . $stock_kilos . ' kilos</strong> | <strong>' . $stock_cantidad . ' cerdos</strong></p>Insuficiente para las cantidades que seleccionó',
             ]);
         }
     }

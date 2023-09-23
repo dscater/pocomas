@@ -57,7 +57,7 @@
                                                 <ul>
                                                     @foreach ($ingreso_producto->detalle_ingresos as $di)
                                                         <li>{{ $di->producto->nombre }} (<strong>{{ $di->kilos }} kg -
-                                                                {{ $di->cantidad }}</strong>)</li>
+                                                                {{ $di->cantidad }} cerdos</strong>)</li>
                                                     @endforeach
                                                 </ul>
                                             </td>

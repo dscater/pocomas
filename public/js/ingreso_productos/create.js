@@ -5,7 +5,6 @@ let fila = `<tr class="fila">
             <td><span></span><input type="hidden" name="kilos[]" /></td>
             <td><span></span><input type="hidden" name="cantidades[]" /></td>
             <td><span></span><input type="hidden" name="precios[]" /></td>
-            <td><span></span><input type="hidden" name="control_stock[]" /></td>
             <td class="accion"><button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button></td>
     </tr>`;
 
@@ -24,7 +23,6 @@ let precio_total = $("#precio_total");
 let total_kilos = $("#total_kilos");
 let total_cantidad = $("#total_cantidad");
 let eliminados = $("#eliminados");
-let tipo_control = $("#tipo_control");
 
 $(document).ready(function () {
     validaFilas();
@@ -98,13 +96,11 @@ function agregarProducto() {
         nueva_fila.children('td').eq(2).children("span").text(kilos.val());
         nueva_fila.children('td').eq(3).children("span").text(cantidad.val());
         nueva_fila.children('td').eq(4).children("span").text(parseFloat(precio_compra.val()).toFixed(2));
-        nueva_fila.children('td').eq(5).children("span").text(tipo_control.val());
         // AGREGANDO VALORES ALOS INPUTS
         nueva_fila.children('td').eq(1).children("input").val(producto_id.val());
         nueva_fila.children('td').eq(2).children("input").val(kilos.val());
         nueva_fila.children('td').eq(3).children("input").val(cantidad.val());
         nueva_fila.children('td').eq(4).children("input").val(precio_compra.val());
-        nueva_fila.children('td').eq(5).children("input").val(tipo_control.val());
 
         // AGREGAR NUEVA FILA
         contenedor_filas.append(nueva_fila);
@@ -127,7 +123,6 @@ function limpiaCampos() {
     // producto_id.val('').trigger('change');
     kilos.val("");
     cantidad.val("");
-    // tipo_control.val("KILOS");
 }
 
 function eliminaFila() {

@@ -71,7 +71,8 @@
                                         <tr>
                                             <td>{{ date('d/m/Y', strtotime($caja_central->fecha)) }}</td>
                                             <td>{{ $caja_central->monto }}</td>
-                                            <td>{{ $caja_central->concepto ? $caja_central->concepto->nombre : '-' }}</td>
+                                            <td>{{ $caja_central->concepto ? $caja_central->concepto->nombre : ($caja_central->ingreso_producto ? 'LOTE' : '-') }}
+                                            </td>
                                             <td>{{ $caja_central->descripcion }}</td>
                                             <td>{{ $caja_central->tipo }}</td>
                                             <td>{{ $caja_central->tipo_transaccion }}</td>

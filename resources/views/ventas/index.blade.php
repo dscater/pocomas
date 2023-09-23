@@ -50,7 +50,8 @@
                                         <th>Caja</th>
                                         <th>Usuario</th>
                                         <th>Cliente</th>
-                                        <th>Cantidad Productos</th>
+                                        <th>Cantidad Kilos</th>
+                                        <th>Cantidad Cerdos</th>
                                         <th>Anticipo</th>
                                         <th>Saldo</th>
                                         <th>Monto Total</th>
@@ -69,6 +70,7 @@
                                             <td>{{ $venta->caja->nombre }}</td>
                                             <td>{{ $venta->user->name }}</td>
                                             <td>{{ $venta->cliente->nombre }}</td>
+                                            <td>{{ $venta->cantidad_total_kilos }}</td>
                                             <td>{{ $venta->cantidad_total }}</td>
                                             <td>{{ $venta->anticipo }}</td>
                                             <td>{{ $venta->saldo }}</td>
@@ -150,6 +152,9 @@
                 null,
                 null,
                 null,
+                {
+                    width: "10%"
+                },
                 {
                     width: "10%"
                 },

@@ -36,7 +36,8 @@
                             @include('ventas.form.form')
                             <div class="row">
                                 <div class="col-md-12 p-0 mt-2">
-                                    <button class="btn btn-danger btn-block" id="btnRegistrarVenta"><i class="fa fa-save"></i>
+                                    <button class="btn btn-danger btn-block" id="btnRegistrarVenta"><i
+                                            class="fa fa-save"></i>
                                         REGISTRAR
                                         VENTA</button>
                                 </div>
@@ -54,7 +55,7 @@
     </section>
     <input type="hidden" id="urlInfoCliente" value="{{ route('clientes.getInfoCliente') }}">
     <input type="hidden" id="urlInfoVenta" value="{{ route('productos.getInfoVenta') }}">
-    <input type="hidden" id="urlMedidaProducto" value="{{ route('productos.getMedida') }}">
+    <input type="hidden" id="urlProductosLote" value="{{ route('ingreso_productos.getProductosLote') }}">
 
     @include('modal.nuevo_cliente')
 @endsection

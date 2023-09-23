@@ -26,22 +26,16 @@
             {{ Form::select('producto_id', $array_productos, null, ['class' => 'form-control select2', 'id' => 'producto_id']) }}
         </div>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-3">
         <div class="form-group">
-            <label class="text-white">Kilos <span id="medida"></span>*</label>
+            <label class="text-white">Kilos de cerdos*</label>
             {{ Form::number('kilos', null, ['class' => 'form-control', 'step' => '0.01', 'min' => '0', 'id' => 'kilos']) }}
         </div>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-3">
         <div class="form-group">
-            <label class="text-white">Cantidad <span id="medida"></span>*</label>
+            <label class="text-white">Cantidad de cerdos*</label>
             {{ Form::text('cantidad', null, ['class' => 'form-control', 'id' => 'cantidad']) }}
-        </div>
-    </div>
-    <div class="col-md-2">
-        <div class="form-group">
-            <label class="text-white">Controlar stock por <span id="medida"></span>*</label>
-            {{ Form::select('tipo_control', ['KILOS' => 'KILOS', 'CANTIDAD' => 'CANTIDAD'], null, ['class' => 'form-control', 'id' => 'tipo_control']) }}
         </div>
     </div>
     <div class="col-md-12">
@@ -57,10 +51,9 @@
                 <tr class="bg-gray">
                     <th width="20px">#</th>
                     <th>Producto</th>
-                    <th>Kilos</th>
-                    <th>Cantidad</th>
+                    <th>Kilos de cerdos</th>
+                    <th>Cantidad de cerdos</th>
                     <th>Precio Compra</th>
-                    <th width="90px">Control de stock</th>
                     <th width="20px">Acción</th>
                 </tr>
             </thead>
@@ -73,7 +66,6 @@
                             <td><span>{{ $di->kilos }}</span></td>
                             <td><span>{{ $di->cantidad }}</span></td>
                             <td><span>{{ $di->precio_compra }}</span></td>
-                            <td><span>{{ $di->tipo_control }}</span></td>
                             <td class="accion"><button type="button" class="btn btn-sm btn-danger"><i
                                         class="fa fa-trash"></i></button></td>
                         </tr>
@@ -87,7 +79,6 @@
                     <th id="total_cantidad"><span>0</span><input type="hidden" name="total_cantidad"></th>
                     <th id="precio_total" class="text-lg"><span>0.00</span><input type="hidden" name="precio_total">
                     </th>
-                    <th></th>
                     <th></th>
                 </tr>
             </tfoot>

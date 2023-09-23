@@ -29,11 +29,8 @@ class KardexProducto extends Model
             ->get()
             ->last();
         $cantidad = 0;
-        if ($detalle_ingreso->producto->medida == 'KILOS') {
-            $cantidad = $detalle_ingreso->kilos;
-        } else {
-            $cantidad = $detalle_ingreso->cantidad;
-        }
+        $cantidad = $detalle_ingreso->kilos;
+
         if ($ultimo) {
             KardexProducto::create([
                 'producto_id' => $producto->id,

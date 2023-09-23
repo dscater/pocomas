@@ -8,7 +8,7 @@ class Producto extends Model
 {
     protected $fillable = [
         'codigo', 'nombre', 'descripcion', 'precio',
-        'medida', 'stock_minimo', 'stock_actual', 'estado', 'foto', 'prioridad',
+        'stock_minimo', 'stock_actual', 'stock_actual_cantidad', 'estado', 'foto', 'prioridad',
         'fecha_registro', 'status',
     ];
 

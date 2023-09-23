@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class DetalleIngreso extends Model
 {
     protected $fillable = [
-        'ingreso_producto_id', 'producto_id', 'kilos', 'cantidad', 'tipo_control', 'stock_kilos', 'stock_cantidad', 'precio_compra', 'anticipo'
+        'ingreso_producto_id', 'producto_id', 'kilos', 'cantidad', 'stock_kilos', 'stock_cantidad', 'precio_compra', 'anticipo_kilos', 'anticipo'
 
     ];
 

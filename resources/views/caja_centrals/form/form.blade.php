@@ -14,9 +14,16 @@
     <div class="col-md-4">
         <div class="form-group">
             <label>Concepto*</label>
-            {{ Form::select('concepto_id', $array_conceptos, null, ['class' => 'form-control', 'required']) }}
+            {{ Form::select('concepto_id', $array_conceptos, null, ['class' => 'form-control', 'required', 'id' => 'concepto_id']) }}
         </div>
     </div>
+    <div class="col-md-4 contenedor_lote oculto">
+        <div class="form-group">
+            <label>Seleccione lote*</label>
+            {{ Form::select('ingreso_producto_id', $array_lotes, null, ['class' => 'form-control', 'id' => 'ingreso_producto_id', 'required']) }}
+        </div>
+    </div>
+
     <div class="col-md-4">
         <div class="form-group">
             <label>Descripción*</label>

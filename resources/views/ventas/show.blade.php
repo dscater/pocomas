@@ -220,7 +220,8 @@
                                             </tr>
                                             @foreach ($venta->detalle as $value)
                                                 <tr>
-                                                    <td class="centreado">{{ $value->cantidad }}</td>
+                                                    <td class="centreado">{{ $value->cantidad_kilos }} Kg
+                                                        ({{ $value->cantidad }} C)</td>
                                                     <td class="izquierda">{{ $value->producto->nombre }}</td>
                                                     <td class="centreado">{{ $value->monto }}</td>
                                                     <td class="centreado">{{ $value->sub_total }}</td>

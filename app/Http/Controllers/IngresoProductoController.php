@@ -57,13 +57,12 @@ class IngresoProductoController extends Controller
             if ($request->tipo == 'AL CONTADO') {
                 $request['saldo'] = 0;
             }
-            $nuevo_ingreso = IngresoProducto::create(array_map('mb_strtoupper', $request->except('productos', 'cantidades', 'kilos', 'control_stock', 'precios')));
+            $nuevo_ingreso = IngresoProducto::create(array_map('mb_strtoupper', $request->except('productos', 'cantidades', 'kilos', 'precios')));
 
             $productos = $request->productos;
             $cantidades = $request->cantidades;
             $kilos = $request->kilos;
             $precios = $request->precios;
-            $control_stock = $request->control_stock;
 
             // REGISTRAR CUENTA POR PAGAR
             if ($request->tipo == 'POR PAGAR') {
@@ -79,11 +78,8 @@ class IngresoProductoController extends Controller
                 for ($i = 0; $i < count($productos); $i++) {
                     // ACTUALIZAR STOCK DEL PRODUCTO
                     $producto = Producto::find($productos[$i]);
-                    if ($producto->medida == 'KILOS') {
-                        $producto->stock_actual = (float)$producto->stock_actual + (float)$kilos[$i];
-                    } else {
-                        $producto->stock_actual = (float)$producto->stock_actual + (float)$cantidades[$i];
-                    }
+                    $producto->stock_actual = (float)$producto->stock_actual + (float)$kilos[$i];
+                    $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad + (float)$cantidades[$i];
                     $producto->save();
 
                     // REGISTRAR EL INGRESO
@@ -92,11 +88,11 @@ class IngresoProductoController extends Controller
                         'producto_id'  => $producto->id,
                         'kilos'  => $kilos[$i],
                         'cantidad'  => $cantidades[$i],
-                        'tipo_control'  => $control_stock[$i],
                         'stock_kilos'  => $kilos[$i],
                         'stock_cantidad'  => $cantidades[$i],
                         'precio_compra'  => $precios[$i],
                         'anticipo' => 0,
+                        'anticipo_kilos' => 0,
                     ]);
                     KardexProducto::registroIngreso($producto, $nuevo_ingreso, $detalle_ingreso);
                 }
@@ -145,11 +141,8 @@ class IngresoProductoController extends Controller
                     $detalle_ingreso = DetalleIngreso::find($eliminados[$i]);
                     //restar la cantidad del ingreso eliminado
                     $producto = $detalle_ingreso->producto;
-                    if ($producto->medida == 'KILOS') {
-                        $producto->stock_actual = (float)$producto->stock_actual - (float)$detalle_ingreso->kilos;
-                    } else {
-                        $producto->stock_actual = (float)$producto->stock_actual - (float)$detalle_ingreso->cantidad;
-                    }
+                    $producto->stock_actual = (float)$producto->stock_actual - (float)$detalle_ingreso->kilos;
+                    $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad - (float)$detalle_ingreso->cantidad;
                     $producto->save();
                     // quitar del kardex
                     $kardex = KardexProducto::where('detalle_ingreso_id', $detalle_ingreso->id)->get()->first();
@@ -168,12 +161,8 @@ class IngresoProductoController extends Controller
                 for ($i = 0; $i < count($productos); $i++) {
                     // ACTUALIZAR STOCK DEL PRODUCTO
                     $producto = Producto::find($productos[$i]);
-                    if ($producto->medida == 'KILOS') {
-                        $producto->stock_actual = (float)$producto->stock_actual + (float)$kilos[$i];
-                    } else {
-                        $producto->stock_actual = (float)$producto->stock_actual + (float)$cantidades[$i];
-                    }
-
+                    $producto->stock_actual = (float)$producto->stock_actual + (float)$kilos[$i];
+                    $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad + (float)$cantidades[$i];
                     $producto->save();
 
                     // REGISTRAR EL INGRESO
@@ -187,6 +176,7 @@ class IngresoProductoController extends Controller
                         'stock_cantidad'  => $cantidades[$i],
                         'precio_compra'  => $precios[$i],
                         'anticipo' => 0,
+                        'anticipo_kilos' => 0,
                     ]);
                     KardexProducto::registroIngreso($producto, $ingreso_producto, $detalle_ingreso);
                 }
@@ -209,13 +199,11 @@ class IngresoProductoController extends Controller
         DB::beginTransaction();
         try {
             foreach ($ingreso_producto->detalle_ingresos as $di) {
-                $cantidad_anterior = $di->cantidad;
+                $cantidad_anterior_kilos = (float)$di->stock_kilos;
+                $cantidad_anterior = (float)$di->stock_cantidad;
                 $producto = $di->producto;
-                if ($producto->medida == 'KILOS') {
-                    $cantidad_anterior = (float)$di->stock_kilos;
-                }
-                $producto->stock_actual = (float)$producto->stock_actual - (float)$cantidad_anterior;
-
+                $producto->stock_actual = (float)$producto->stock_actual - (float)$cantidad_anterior_kilos;
+                $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad - (float)$cantidad_anterior;
                 $producto->save();
             }
             $ingreso_producto->estado = 0;
@@ -243,12 +231,21 @@ class IngresoProductoController extends Controller
 
     public function getProductosLote(Request $request)
     {
-        $detalle_ingresos = DetalleIngreso::where("ingreso_producto_id", $request->id)->get();
-        $html = '<option value="">Seleccione...</option>';
-        foreach ($detalle_ingresos as $value) {
-            $html .= '<option value="' . $value->id . '">' . $value->producto->nombre . '</option>';
+        $html = '<option value="">- Sin Productos -</option>';
+        if (isset($request->stock)) {
+            $html = '<option value="">Seleccione...</option>';
+            $detalle_ingresos = DetalleIngreso::where("ingreso_producto_id", $request->id)->where("stock_kilos", ">", 0)
+                ->where("stock_cantidad", ">", 0)->get();
+            foreach ($detalle_ingresos as $value) {
+                $html .= '<option value="' . $value->id . '">' . $value->producto->nombre . '</option>';
+            }
+        } else {
+            $html = '<option value="">Seleccione...</option>';
+            $detalle_ingresos = DetalleIngreso::where("ingreso_producto_id", $request->id)->get();
+            foreach ($detalle_ingresos as $value) {
+                $html .= '<option value="' . $value->id . '">' . $value->producto->nombre . '</option>';
+            }
         }
-
         return response()->JSON($html);
     }
 }

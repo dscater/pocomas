@@ -175,12 +175,13 @@
         <thead>
             <tr>
                 <th class="border_bottom border_top">CLIENTE:</th>
-                <th class="border_bottom border_top" colspan="8" style="text-align: left;">{{ $cliente->nombre }}</th>
+                <th class="border_bottom border_top" colspan="9" style="text-align: left;">{{ $cliente->nombre }}</th>
             </tr>
             <tr>
                 <th class="border_bottom">FECHA</th>
                 <th class="border_bottom">PRODUCTO</th>
-                <th class="border_bottom">CANTIDAD</th>
+                <th class="border_bottom">CANTIDAD KILOS</th>
+                <th class="border_bottom">CANTIDAD CERDO</th>
                 <th class="border_bottom">P/U</th>
                 <th class="border_bottom">BS.</th>
                 <th class="border_bottom">DESCUENTO</th>
@@ -201,6 +202,7 @@
                     <tr>
                         <td class="centreado">{{ date('d/m/Y', strtotime($cuenta_cobrar->venta->fecha_venta)) }}</td>
                         <td class="centreado">{{ $detalle->venta_detalle->producto->nombre }}</td>
+                        <td class="centreado">{{ $detalle->venta_detalle->cantidad_kilos }}</td>
                         <td class="centreado">{{ $detalle->venta_detalle->cantidad }}</td>
                         <td class="centreado">{{ $detalle->venta_detalle->producto->precio }}</td>
                         <td class="centreado">{{ $detalle->venta_detalle->total_sd }}</td>
@@ -218,7 +220,7 @@
                 @endforeach
             @endforeach
             <tr>
-                <td class="bold derecha border_top" colspan="4">TOTAL EFECTIVO</td>
+                <td class="bold derecha border_top" colspan="5">TOTAL EFECTIVO</td>
                 <td class="centreado border_top">{{ number_format($total_sd, 2) }}</td>
                 <td class="border_top"></td>
                 <td class="centreado border_top">{{ number_format($total_dc, 2) }}</td>

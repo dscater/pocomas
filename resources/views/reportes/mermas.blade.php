@@ -171,13 +171,16 @@
         <thead>
             <tr>
                 <th>FECHA</th>
+                <th>LOTE</th>
                 <th>PRODUCTO</th>
-                <th>CANTIDAD</th>
+                <th>CANTIDAD KILOS</th>
+                <th>CANTIDAD CERDOS</th>
                 <th>PORCENTAJE</th>
             </tr>
         </thead>
         <tbody>
             @php
+                $total_cantidad_kilos = 0;
                 $total_cantidad = 0;
                 $total_entrada = 0;
                 $total_porcentaje = 0;
@@ -185,18 +188,22 @@
             @foreach ($mermas as $value)
                 <tr>
                     <td>{{ $value->fecha }}</td>
-                    <td>{{ $value->producto->nombre }}</td>
+                    <td>{{ $value->detalle_ingreso->ingreso_producto->nro_lote }}</td>
+                    <td>{{ $value->detalle_ingreso->producto->nombre }}</td>
+                    <td class="centreado">{{ $value->cantidad_kilos }}</td>
                     <td class="centreado">{{ $value->cantidad }}</td>
                     <td class="centreado">{{ $value->porcentaje }}%</td>
                 </tr>
                 @php
+                    $total_cantidad_kilos += (float) $value->cantidad_kilos;
                     $total_cantidad += (float) $value->cantidad;
                     $total_entrada += (float) $value->entrada;
                     $total_porcentaje += (float) $value->porcentaje;
                 @endphp
             @endforeach
             <tr>
-                <td class="bold" colspan="2">TOTAL</td>
+                <td class="bold" colspan="3">TOTAL</td>
+                <td class="bold centreado">{{ $total_cantidad_kilos }}</td>
                 <td class="bold centreado">{{ $total_cantidad }}</td>
                 <td class="bold centreado">{{ $total_porcentaje }}%</td>
             </tr>

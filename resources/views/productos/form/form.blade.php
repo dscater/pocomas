@@ -28,29 +28,10 @@
     </div>
     <div class="col-md-4">
         <div class="form-group">
-            <label>Unidad de Medida*</label>
-            {{ Form::select(
-                'medida',
-                [
-                    '' => 'Seleccione...',
-                    'UNIDAD' => 'UNIDAD',
-                    'KILOS' => 'KILOS',
-                ],
-                null,
-                ['class' => 'form-control', 'required'],
-            ) }}
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="form-group">
             <label>Stock Mínimo*</label>
             {{ Form::number('stock_minimo', null, ['class' => 'form-control', 'required', 'step' => '0.01', 'min' => '0']) }}
         </div>
     </div>
-</div>
-
-<div class="row">
     <div class="col-md-4">
         <div class="form-group">
             <label>Foto</label>
