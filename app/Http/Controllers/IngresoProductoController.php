@@ -248,4 +248,15 @@ class IngresoProductoController extends Controller
         }
         return response()->JSON($html);
     }
+
+    public function getProductosLoteSumado(Request $request)
+    {
+        $productos = DetalleIngreso::select("producto_id")->where("ingreso_producto_id", $request->id)->distinct("producto_id")->get();
+        $html = '<option value="">Seleccione...</option>';
+        foreach ($productos as $value) {
+            $producto = Producto::find($value->producto_id);
+            $html .= '<option value="' . $producto->id . '">' . $producto->nombre . '</option>';
+        }
+        return response()->JSON($html);
+    }
 }

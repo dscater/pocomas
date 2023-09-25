@@ -55,7 +55,7 @@
     </section>
     <input type="hidden" id="urlInfoCliente" value="{{ route('clientes.getInfoCliente') }}">
     <input type="hidden" id="urlInfoVenta" value="{{ route('productos.getInfoVenta') }}">
-    <input type="hidden" id="urlProductosLote" value="{{ route('ingreso_productos.getProductosLote') }}">
+    <input type="hidden" id="urlProductosLote" value="{{ route('ingreso_productos.getProductosLoteSumado') }}">
 
     @include('modal.nuevo_cliente')
 @endsection

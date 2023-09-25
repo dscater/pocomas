@@ -10,10 +10,12 @@ let fila = `<tr class="fila">
                     <span class="valor"></span>
                 </td>
                 <td data-col="Cantidad Kilos:">
+                    <input type="hidden" name="kilos_lotes[]" value="0" />
                     <input type="hidden" name="cantidad_kilos[]" value="0" />
                     <span class="valor"></span>
                 </td>
                 <td data-col="Cantidad Cerdos:">
+                    <input type="hidden" name="cantidad_lotes[]" value="0" />
                     <input type="hidden" name="cantidads[]" value="0" />
                     <span class="valor"></span>
                 </td>
@@ -91,7 +93,7 @@ $(document).ready(function () {
 
     tipo_venta.change(function () {
         monto_cambio.parents("tr").removeClass("oculto");
-
+        monto_recibido.parents("tr").removeClass("oculto");
         if (
             tipo_venta.val() == "BANCO" ||
             tipo_venta.val() == "POR COBRAR" ||
@@ -171,7 +173,8 @@ $(document).ready(function () {
                 type: "GET",
                 url: $("#urlInfoVenta").val(),
                 data: {
-                    detalle_ingreso_id: select_producto.val(),
+                    ingreso_producto_id: select_ingreso_producto.val(),
+                    producto_id: select_producto.val(),
                     cantidad_kilos: input_cantidad_kilos.val(),
                     cantidad: input_cantidad.val(),
                 },
@@ -179,9 +182,13 @@ $(document).ready(function () {
                 success: function (response) {
                     if (response.sw) {
                         // CREAR FILAS DEACUERDO AL ARRAY OBTENIDO
+                        let string_ids = response.string_ids_lotes;
+                        let string_cantidad_kilos_lotes =
+                            response.string_cantidad_kilos_lotes;
+                        let string_cantidad_lotes =
+                            response.string_cantidad_lotes;
                         let precio = response.precio;
                         let producto = response.producto;
-                        let detalle_ingreso = response.detalle_ingreso;
                         let nueva_fila = $(fila).clone();
 
                         // producto
@@ -196,7 +203,7 @@ $(document).ready(function () {
                             .eq(1)
                             .children("input")
                             .eq(0)
-                            .val(detalle_ingreso.id);
+                            .val(string_ids);
                         nueva_fila
                             .children("td")
                             .eq(1)
@@ -227,6 +234,12 @@ $(document).ready(function () {
                             .eq(3)
                             .children("input")
                             .eq(0)
+                            .val(string_cantidad_kilos_lotes);
+                        nueva_fila
+                            .children("td")
+                            .eq(3)
+                            .children("input")
+                            .eq(1)
                             .val(input_cantidad_kilos.val());
 
                         // cantidad cerdos
@@ -240,6 +253,12 @@ $(document).ready(function () {
                             .eq(4)
                             .children("input")
                             .eq(0)
+                            .val(string_cantidad_lotes);
+                        nueva_fila
+                            .children("td")
+                            .eq(4)
+                            .children("input")
+                            .eq(1)
                             .val(input_cantidad.val());
 
                         // obtener el total S/D
@@ -328,7 +347,7 @@ $(document).ready(function () {
 });
 
 function calculaCambio() {
-    let total = totales.children("td").eq(3).children("input").eq(1).val();
+    let total = totales.children("td").eq(4).children("input").eq(1).val();
     if (total && total.trim() != "") {
         if (monto_recibido.val().trim() != "") {
             let recibido = parseFloat(monto_recibido.val());
@@ -429,9 +448,9 @@ function ennumeraFilas() {
                 .children("td")
                 .eq(3)
                 .children("input")
-                .eq(0)
+                .eq(1)
                 .val();
-            cant = $(this).children("td").eq(4).children("input").eq(0).val();
+            cant = $(this).children("td").eq(4).children("input").eq(1).val();
             mon = $(this).children("td").eq(7).children("input").val();
             total_cantidad_kilos += parseFloat(cant_kilos);
             total_cantidad += parseFloat(cant);

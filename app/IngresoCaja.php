@@ -67,6 +67,7 @@ class IngresoCaja extends Model
                     $saldo = (float)$venta->monto_total - (float)$anticipo;
                     $venta->saldo = $saldo;
                     $venta->save();
+                    Venta::eliminarVentaConfirmacionAnticipo($venta);
                     $ingreso_caja->delete();
                     return 1;
                 } else {

@@ -95,6 +95,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('productos/getInfo/getMedida', 'ProductoController@getMedida')->name('productos.getMedida');
 
     // INGRESO DE PRODUCTOS
+    Route::get('ingreso_productos/getProductosLoteSumado', 'IngresoProductoController@getProductosLoteSumado')->name('ingreso_productos.getProductosLoteSumado');
+
     Route::get('ingreso_productos/getProductosLote', 'IngresoProductoController@getProductosLote')->name('ingreso_productos.getProductosLote');
 
     Route::get('ingreso_productos/getIngreso', 'IngresoProductoController@getIngreso')->name('ingreso_productos.getIngreso');

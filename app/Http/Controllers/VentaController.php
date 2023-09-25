@@ -146,13 +146,14 @@ class VentaController extends Controller
             $lote_id  = $request->lote_id;
             $productos = $request->productos;
             $costos = $request->costos;
+            $kilos_lotes = $request->kilos_lotes;
+            $cantidad_lotes = $request->cantidad_lotes;
             $cantidad_kilos = $request->cantidad_kilos;
             $cantidads = $request->cantidads;
             $descuentos = $request->descuentos;
             $totales = $request->totales;
             for ($i = 0; $i < count($productos); $i++) {
-                $producto = Producto::find($productos[$i]);
-
+                Log::debug("for" . $i);
                 $desc = 0;
                 if (isset($descuentos[$i]) && $descuentos[$i] != "" && $descuentos[$i] != NULL) {
                     $desc  = $descuentos[$i];
@@ -160,9 +161,10 @@ class VentaController extends Controller
 
                 $nuevo_detalle_venta = VentaDetalle::create([
                     'venta_id' => $nueva_venta->id,
-                    'detalle_ingreso_id' => $lote_id[$i],
                     'producto_id' => $productos[$i],
                     'detalle_ingreso_id' => $lote_id[$i],
+                    'lotes_cantidad' => $cantidad_lotes[$i],
+                    'lotes_kilos' => $kilos_lotes[$i],
                     'cantidad_kilos' => $cantidad_kilos[$i],
                     'cantidad' => $cantidads[$i],
                     'monto' => $costos[$i],
@@ -172,26 +174,32 @@ class VentaController extends Controller
 
                 // VALIDAR SI EL TIPO DE VENTA ES ANTICIPOS: NO ACTUALIZAR EL STOCK
                 // ARMAR LOS DETALLES STRINGS A ARRAYS
-                $detalle_ingreso = DetalleIngreso::find($lote_id[$i]);
-                if ($nueva_venta->tipo_venta != "ANTICIPOS") {
-                    // stock del DETALLE DEL LOTE
-                    $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos - (float)$cantidad_kilos[$i];
-                    $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad - (float)$cantidads[$i];
-                    $detalle_ingreso->save();
+                $array_id_lotes = explode(",", $nuevo_detalle_venta->detalle_ingreso_id);
+                $array_cantidad_lotes = explode(",", $nuevo_detalle_venta->lotes_cantidad);
+                $array_cantidad_kilos_lotes = explode(",", $nuevo_detalle_venta->lotes_kilos);
 
-                    // stock del PRODUCTO
-                    $detalle_ingreso->producto->stock_actual = (float)$detalle_ingreso->producto->stock_actual - (float)$cantidad_kilos[$i];
-                    $detalle_ingreso->producto->stock_actual_cantidad = (float)$detalle_ingreso->producto->stock_actual_cantidad - (float)$cantidads[$i];
-                    $detalle_ingreso->producto->save();
+                for ($k = 0; $k < count($array_id_lotes); $k++) {
+                    $detalle_ingreso = DetalleIngreso::find($array_id_lotes[$k]);
+                    if ($nueva_venta->tipo_venta != "ANTICIPOS") {
+                        // stock del DETALLE DEL LOTE
+                        $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos - (float)$array_cantidad_kilos_lotes[$k];
+                        $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad - (float)$array_cantidad_lotes[$k];
+                        $detalle_ingreso->save();
 
-                    // actualizar kardex
-                    KardexProducto::registroEgreso($detalle_ingreso->producto, $cantidad_kilos[$i], $detalle_ingreso->id);
-                } else {
-                    $detalle_ingreso->anticipo_kilos = (float)$detalle_ingreso->anticipo_kilos + (float)$cantidad_kilos[$i];
-                    $detalle_ingreso->anticipo = (float)$detalle_ingreso->anticipo + (float)$cantidads[$i];
-                    $detalle_ingreso->save();
+                        // stock del PRODUCTO
+                        $detalle_ingreso->producto->stock_actual = (float)$detalle_ingreso->producto->stock_actual - (float)$array_cantidad_kilos_lotes[$k];
+                        $detalle_ingreso->producto->stock_actual_cantidad = (float)$detalle_ingreso->producto->stock_actual_cantidad - (float)$array_cantidad_lotes[$k];
+                        $detalle_ingreso->producto->save();
+                        // actualizar kardex
+                        KardexProducto::registroEgreso($detalle_ingreso->producto, $array_cantidad_kilos_lotes[$k], $array_id_lotes[$k]);
+                    } else {
+                        $detalle_ingreso->anticipo_kilos = (float)$detalle_ingreso->anticipo_kilos + (float)$array_cantidad_kilos_lotes[$k];
+                        $detalle_ingreso->anticipo = (float)$detalle_ingreso->anticipo + (float)$array_cantidad_lotes[$k];
+                        $detalle_ingreso->save();
+                    }
                 }
             }
+
 
             // registrar factura
             $nro_factura = 1;
@@ -208,9 +216,6 @@ class VentaController extends Controller
 
             // registrar ingreso si es venta de tipo AL CONTADO
             $concepto_id = 0;
-            // if ($nueva_venta->tipo_venta == 'AL CONTADO' || $nueva_venta->tipo_venta == "ANTICIPOS") {
-            //     $concepto_id = $request->concepto_id;
-            // }
 
             if ($nueva_venta->tipo_venta == 'AL CONTADO' || $nueva_venta->tipo_venta == "ANTICIPOS" || $nueva_venta->tipo_venta == "BANCO") {
                 if ($request->tipo_venta == "ANTICIPOS") {
@@ -347,21 +352,26 @@ class VentaController extends Controller
         foreach ($venta->detalle as $d) {
             // stock del DETALLE DEL LOTE
             // ARMAR LOS DETALLES STRINGS A ARRAYS
-            $detalle_ingreso = DetalleIngreso::find($d->detalle_ingreso_id);
-            $detalle_ingreso->anticipo = (float)$detalle_ingreso->anticipo - (float)$d->cantidad;
-            $detalle_ingreso->anticipo_kilos = (float)$detalle_ingreso->anticipo_kilos - (float)$d->cantidad_kilos;
+            $array_id_lotes = explode(",", $d->detalle_ingreso_id);
+            $array_cantidad_lotes = explode(",", $d->lotes_cantidad);
+            $array_cantidad_kilos_lotes = explode(",", $d->lotes_kilos);
+            for ($k = 0; $k < count($array_id_lotes); $k++) {
+                $detalle_ingreso = DetalleIngreso::find($array_id_lotes[$k]);
+                $detalle_ingreso->anticipo_kilos = (float)$detalle_ingreso->anticipo_kilos - (float)$array_cantidad_kilos_lotes[$k];
+                $detalle_ingreso->anticipo = (float)$detalle_ingreso->anticipo - (float)$array_cantidad_lotes[$k];
 
-            // stock del DETALLE DEL LOTE
-            $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos - (float)$d->cantidad_kilos;
-            $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad - (float)$d->cantidad;
-            $detalle_ingreso->save();
+                // stock del DETALLE DEL LOTE
+                $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos - (float)$array_cantidad_kilos_lotes[$k];
+                $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad - (float)$array_cantidad_lotes[$k];
+                $detalle_ingreso->save();
 
-            // stock del PRODUCTO
-            $detalle_ingreso->producto->stock_actual = (float)$detalle_ingreso->producto->stock_actual - (float)$d->cantidad_kilos;
-            $detalle_ingreso->producto->stock_actual_cantidad = (float)$detalle_ingreso->producto->stock_actual_cantidad - (float)$d->cantidad;
-            $detalle_ingreso->producto->save();
-            // actualizar kardex
-            KardexProducto::registroEgreso($detalle_ingreso->producto, $d->cantidad_kilos, $detalle_ingreso->id);
+                // stock del PRODUCTO
+                $detalle_ingreso->producto->stock_actual = (float)$detalle_ingreso->producto->stock_actual - (float)$array_cantidad_kilos_lotes[$k];
+                $detalle_ingreso->producto->stock_actual_cantidad = (float)$detalle_ingreso->producto->stock_actual_cantidad - (float)$array_cantidad_lotes[$k];
+                $detalle_ingreso->producto->save();
+                // actualizar kardex
+                KardexProducto::registroEgreso($detalle_ingreso->producto, $array_cantidad_kilos_lotes[$k], $array_id_lotes[$k]);
+            }
         }
 
         // REGISTRAR SALDO A LA CAJA
@@ -403,39 +413,44 @@ class VentaController extends Controller
             foreach ($venta->detalle as $value) {
                 // BUSCAR EL DETALLE DEL LOTE
                 // ARMAR LOS DETALLES STRINGS A ARRAYS
-                $detalle_ingreso = DetalleIngreso::find($value->detalle_ingreso_id);
-                // SI ES ANTICIPO RESTABLECER COMO DISPONIBLE EL STOCK DEL DETALLE
-                if ($venta->tipo_venta == "ANTICIPOS" && $venta->saldo > 0) {
-                    $detalle_ingreso->anticipo_kilos = (float)$detalle_ingreso->anticipo_kilos - (float)$value->cantidad_kilos;
-                    $detalle_ingreso->anticipo = (float)$detalle_ingreso->anticipo - (float)$value->cantidad;
-                    $detalle_ingreso->save();
-                } else {
-                    // stock del DETALLE DEL LOTE
-                    $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos + (float)$value->cantidad_kilos;
-                    $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad + (float)$value->cantidad;
-                    $detalle_ingreso->save();
-                    // incrementar stock producto
-                    $producto = $detalle_ingreso->producto;
-                    $producto->stock_actual = (float)$producto->stock_actual + (float)$value->cantidad_kilos;
-                    $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad + (float)$value->cantidad;
-                    $producto->save();
+                $array_id_lotes = explode(",", $value->detalle_ingreso_id);
+                $array_cantidad_lotes = explode(",", $value->lotes_cantidad);
+                $array_cantidad_kilos_lotes = explode(",", $value->lotes_kilos);
+                for ($k = 0; $k < count($array_id_lotes); $k++) {
+                    $detalle_ingreso = DetalleIngreso::find($array_id_lotes[$k]);
+                    // SI ES ANTICIPO RESTABLECER COMO DISPONIBLE EL STOCK DEL DETALLE
+                    if ($venta->tipo_venta == "ANTICIPOS" && $venta->saldo > 0) {
+                        $detalle_ingreso->anticipo_kilos = (float)$detalle_ingreso->anticipo_kilos - (float)$array_cantidad_kilos_lotes[$k];
+                        $detalle_ingreso->anticipo = (float)$detalle_ingreso->anticipo - (float)$array_cantidad_lotes[$k];
+                        $detalle_ingreso->save();
+                    } else {
+                        // incrementar stock lote-detalle
+                        $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos + (float)$array_cantidad_kilos_lotes[$k];
+                        $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad + (float)$array_cantidad_lotes[$k];
+                        $detalle_ingreso->save();
+                        // incrementar stock producto
+                        $producto = $detalle_ingreso->producto;
+                        $producto->stock_actual = (float)$producto->stock_actual + (float)$array_cantidad_kilos_lotes[$k];
+                        $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad + (float)$array_cantidad_lotes[$k];
+                        $producto->save();
 
-                    $ultimo = KardexProducto::where('producto_id', $producto->id)
-                        ->orderBy('created_at', 'asc')
-                        ->get()
-                        ->last();
-                    KardexProducto::create([
-                        'producto_id' => $producto->id,
-                        'detalle_ingreso_id' => $detalle_ingreso->id,
-                        'fecha' => date('Y-m-d'),
-                        'detalle' => 'INGRESO POR DEVOLUCIÓN DE VENTA AL LOTE NRO. ' . $detalle_ingreso->ingreso_producto->nro_lote,
-                        'tipo' => 'INGRESO',
-                        'ingreso_c' => $value->cantidad_kilos,
-                        'saldo_c' => (float)$ultimo->saldo_c + (float)$value->cantidad_kilos,
-                        'cu' => $producto->precio,
-                        'ingreso_m' => (float)$value->cantidad_kilos * (float)$producto->precio,
-                        'saldo_m' => (float)$ultimo->saldo_m + ((float)$value->cantidad_kilos * (float)$producto->precio)
-                    ]);
+                        $ultimo = KardexProducto::where('producto_id', $producto->id)
+                            ->orderBy('created_at', 'asc')
+                            ->get()
+                            ->last();
+                        KardexProducto::create([
+                            'producto_id' => $producto->id,
+                            'detalle_ingreso_id' => $array_id_lotes[$k],
+                            'fecha' => date('Y-m-d'),
+                            'detalle' => 'INGRESO POR DEVOLUCIÓN DE VENTA AL LOTE NRO. ' . $detalle_ingreso->ingreso_producto->nro_lote,
+                            'tipo' => 'INGRESO',
+                            'ingreso_c' => $array_cantidad_kilos_lotes[$k],
+                            'saldo_c' => (float)$ultimo->saldo_c + (float)$array_cantidad_kilos_lotes[$k],
+                            'cu' => $producto->precio,
+                            'ingreso_m' => (float)$array_cantidad_kilos_lotes[$k] * (float)$producto->precio,
+                            'saldo_m' => (float)$ultimo->saldo_m + ((float)$array_cantidad_kilos_lotes[$k] * (float)$producto->precio)
+                        ]);
+                    }
                 }
             }
 

@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class IngresoProducto extends Model
 {
@@ -36,30 +37,37 @@ class IngresoProducto extends Model
     }
 
     // ARMA STOCKS POR LOTE
-    public static function getProductosLote($producto, $cantidad)
+    public static function getProductosLote($producto, $lote, $cantidad_kilos, $cantidad)
     {
         // OBTENER LOS LOTES CON STOCKS DISPONIBLES DE FORMA ASCENDENTE
         $detalle_ingresos = DetalleIngreso::select("detalle_ingresos.*")
             ->join("ingreso_productos", "ingreso_productos.id", "=", "detalle_ingresos.ingreso_producto_id")
             ->where("producto_id", $producto)
+            ->where("ingreso_producto_id", $lote)
             ->where("stock_kilos", ">", 0)
+            ->where("stock_cantidad", ">", 0)
             ->where("ingreso_productos.estado", 1)
             ->orderBy("fecha_ingreso", "asc")->get();
 
         $array_lotes = [
             "ids" => [],
-            "cantidades" => []
+            "kilos" => [],
+            "cantidad" => [],
         ];
         foreach ($detalle_ingresos as $di) {
-            $total_disponible = (float)$di->stock_kilos - (float)$di->anticipo;
-            if ($cantidad <= $total_disponible) {
+            $total_disponible_kilos = (float)$di->stock_kilos - (float)$di->anticipo_kilos;
+            $total_disponible_cantidad = (float)$di->stock_cantidad - (float)$di->anticipo;
+            if ($cantidad_kilos <= $total_disponible_kilos && $cantidad <= $total_disponible_cantidad) {
                 $array_lotes["ids"][] = $di->id;
-                $array_lotes["cantidades"][] = (float)$cantidad;
+                $array_lotes["cantidad"][] = (float)$cantidad;
+                $array_lotes["kilos"][] = (float)$cantidad_kilos;
                 break;
             } else {
                 $array_lotes["ids"][] = $di->id;
-                $array_lotes["cantidades"][] = $total_disponible;
-                $cantidad = (float)$cantidad - $total_disponible;
+                $array_lotes["kilos"][] = $total_disponible_kilos;
+                $array_lotes["cantidad"][] = $total_disponible_cantidad;
+                $cantidad_kilos = (float)$cantidad_kilos - $total_disponible_kilos;
+                $cantidad = (float)$cantidad - $total_disponible_cantidad;
             }
         }
 
