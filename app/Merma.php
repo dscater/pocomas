@@ -7,15 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 class Merma extends Model
 {
     protected $fillable = [
-        "detalle_ingreso_id",
+        "ingreso_producto_id",
+        "producto_id",
         "fecha",
         "cantidad_kilos",
         "cantidad",
         "porcentaje",
     ];
 
-    public function detalle_ingreso()
+    public function ingreso_producto()
     {
-        return $this->belongsTo(DetalleIngreso::class, 'detalle_ingreso_id');
+        return $this->belongsTo(IngresoProducto::class, 'ingreso_producto_id');
+    }
+
+    public function producto()
+    {
+        return $this->belongsTo(Producto::class, 'producto_id');
     }
 }

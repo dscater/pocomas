@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost:3306
--- Tiempo de generación: 23-09-2023 a las 18:31:27
+-- Tiempo de generación: 25-09-2023 a las 16:10:04
 -- Versión del servidor: 8.0.30
 -- Versión de PHP: 7.4.19
 
@@ -468,7 +468,8 @@ CREATE TABLE `kardex_productos` (
 
 CREATE TABLE `mermas` (
   `id` bigint UNSIGNED NOT NULL,
-  `detalle_ingreso_id` bigint UNSIGNED NOT NULL,
+  `ingreso_producto_id` bigint UNSIGNED NOT NULL,
+  `producto_id` bigint UNSIGNED NOT NULL,
   `fecha` date NOT NULL,
   `cantidad_kilos` double NOT NULL,
   `cantidad` double NOT NULL,
@@ -535,11 +536,9 @@ CREATE TABLE `productos` (
 --
 
 INSERT INTO `productos` (`id`, `codigo`, `nombre`, `descripcion`, `precio`, `stock_minimo`, `stock_actual`, `stock_actual_cantidad`, `estado`, `foto`, `prioridad`, `fecha_registro`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'P001', 'PRODUCTO 1', '', 25.00, 10, 0, 0, 'ACTIVO', 'producto_default.png', 'NORMAL', '2022-11-26', 1, '2022-11-26 12:49:24', '2023-09-23 16:58:10'),
-(2, 'P002', 'PRODUCTO 2', '', 35.00, 10, 0, 0, 'ACTIVO', 'producto_default.png', 'PRINCIPAL', '2022-11-26', 1, '2022-11-26 12:54:45', '2023-09-23 18:28:03'),
-(3, 'P002', 'PRODUCTO 3', '', 100.00, 20, 0, 0, 'ACTIVO', 'producto_default.png', 'NORMAL', '2023-08-10', 1, '2023-08-11 01:06:13', '2023-09-23 16:58:41'),
-(4, 'P004', 'PRODUCTO 4', 'P# 4', 35.00, 20, 0, 0, 'ACTIVO', 'producto_default.png', 'DEL PRINCIPAL', '2023-09-02', 1, '2023-09-02 15:39:12', '2023-09-23 18:14:41'),
-(5, 'P005', 'PRODUCTO 5', 'DESC. PROD #5', 45.00, 5, 0, 0, 'ACTIVO', 'producto_default.png', 'NORMAL', '2023-09-23', 1, '2023-09-23 18:12:41', '2023-09-23 18:28:03');
+(1, 'P001', 'PRODUCTO 1', 'DESC', 40.00, 10, 0, 0, 'ACTIVO', 'producto_default.png', 'NORMAL', '2023-09-25', 1, '2023-09-25 14:44:52', '2023-09-25 16:05:51'),
+(2, 'P002', 'PRODUCTO 2', '', 35.00, 10, 0, 0, 'ACTIVO', 'producto_default.png', 'PRINCIPAL', '2023-09-25', 1, '2023-09-25 14:45:05', '2023-09-25 14:45:05'),
+(3, 'P003', 'PRODUCTO 3', 'DESC 3', 50.00, 10, 0, 0, 'ACTIVO', 'producto_default.png', 'DEL PRINCIPAL', '2023-09-25', 1, '2023-09-25 14:45:17', '2023-09-25 14:45:17');
 
 -- --------------------------------------------------------
 
@@ -704,7 +703,9 @@ CREATE TABLE `venta_detalles` (
   `id` bigint UNSIGNED NOT NULL,
   `venta_id` bigint UNSIGNED NOT NULL,
   `producto_id` bigint UNSIGNED NOT NULL,
-  `detalle_ingreso_id` bigint UNSIGNED NOT NULL,
+  `detalle_ingreso_id` varchar(244) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `lotes_cantidad` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `lotes_kilos` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `cantidad_kilos` double NOT NULL,
   `cantidad` double NOT NULL,
   `monto` decimal(24,2) NOT NULL,
@@ -1056,7 +1057,7 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT de la tabla `productos`
 --
 ALTER TABLE `productos`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `proveedors`

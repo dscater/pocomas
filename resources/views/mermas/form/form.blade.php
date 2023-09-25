@@ -2,13 +2,13 @@
     <div class="col-md-2">
         <div class="form-group">
             <label>Lote*</label>
-            {{ Form::select('ingreso_producto_id', $array_lotes, isset($merma) ? $merma->detalle_ingreso->ingreso_producto->id : null, ['class' => 'form-control select2', 'id' => 'ingreso_producto_id']) }}
+            {{ Form::select('ingreso_producto_id', $array_lotes, isset($merma) ? $merma->ingreso_producto->id : null, ['class' => 'form-control select2', 'id' => 'ingreso_producto_id']) }}
         </div>
     </div>
     <div class="col-md-4">
         <div class="form-group">
             <label>Producto*</label>
-            {{ Form::select('detalle_ingreso_id', [], null, ['class' => 'form-control select2', 'id' => 'detalle_ingreso_id', 'required']) }}
+            {{ Form::select('producto_id', [], null, ['class' => 'form-control select2', 'id' => 'producto_id', 'required']) }}
         </div>
     </div>
     <div class="col-md-2">

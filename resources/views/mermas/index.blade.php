@@ -49,8 +49,8 @@
                                     @foreach ($mermas as $merma)
                                         <tr>
                                             <td>{{ $merma->fecha }}</td>
-                                            <td>{{ $merma->detalle_ingreso->ingreso_producto->nro_lote }}</td>
-                                            <td>{{ $merma->detalle_ingreso->producto->nombre }}</td>
+                                            <td>{{ $merma->ingreso_producto->nro_lote }}</td>
+                                            <td>{{ $merma->producto->nombre }}</td>
                                             <td>{{ $merma->cantidad_kilos }}</td>
                                             <td>{{ $merma->cantidad }}</td>
                                             <td class="btns-opciones">

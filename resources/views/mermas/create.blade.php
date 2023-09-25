@@ -46,12 +46,12 @@
             <!-- /.row -->
         </div>
     </section>
-    <input type="hidden" value="{{ route('ingreso_productos.getProductosLote') }}?stock=true" id="url_productos_lote">
+    <input type="hidden" value="{{ route('ingreso_productos.getProductosLoteSumado') }}?stock=true" id="url_productos_lote">
 @endsection
 @section('scripts')
     <script>
         let ingreso_producto_id = $("#ingreso_producto_id");
-        let detalle_ingreso_id = $("#detalle_ingreso_id");
+        let producto_id = $("#producto_id");
 
         ingreso_producto_id.on("change keyup", getProductosLote);
 
@@ -65,11 +65,11 @@
                     },
                     dataType: "json",
                     success: function(response) {
-                        detalle_ingreso_id.html(response);
+                        producto_id.html(response);
                     }
                 });
             } else {
-                detalle_ingreso_id.html("");
+                producto_id.html("");
             }
         }
     </script>

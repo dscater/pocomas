@@ -188,8 +188,8 @@
             @foreach ($mermas as $value)
                 <tr>
                     <td>{{ $value->fecha }}</td>
-                    <td>{{ $value->detalle_ingreso->ingreso_producto->nro_lote }}</td>
-                    <td>{{ $value->detalle_ingreso->producto->nombre }}</td>
+                    <td>{{ $value->ingreso_producto->nro_lote }}</td>
+                    <td>{{ $value->producto->nombre }}</td>
                     <td class="centreado">{{ $value->cantidad_kilos }}</td>
                     <td class="centreado">{{ $value->cantidad }}</td>
                     <td class="centreado">{{ $value->porcentaje }}%</td>

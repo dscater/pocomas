@@ -33,17 +33,51 @@ class MermaController extends Controller
     {
         DB::beginTransaction();
         try {
-            $detalle_ingreso = DetalleIngreso::findOrFail($request->detalle_ingreso_id);
-            $request["detalle_ingreso_id"] = $detalle_ingreso->id;
-            $request["porcentaje"] = ((float)$request->cantidad_kilos * 100) / $detalle_ingreso->stock_kilos;
+            $producto = Producto::find($request->producto_id);
+            $cantidad_kilos = $request->cantidad_kilos;
+            $cantidad = $request->cantidad;
+
+            $detalle_ingresos = DetalleIngreso::where("ingreso_producto_id", $request->ingreso_producto_id)
+                ->where("producto_id", $request->producto_id)
+                ->where("stock_kilos", ">", 0)
+                ->where("stock_cantidad", ">", 0)
+                ->get();
+
+            $request["producto_id"] = $producto->id;
+            $request["porcentaje"] = ((float)$cantidad_kilos * 100) / $producto->stock_actual;
 
             $merma = Merma::create(array_map('mb_strtoupper', $request->all()));
-            // stock del detalle
-            $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos - (float)$merma->cantidad_kilos;
-            $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad - (float)$merma->cantidad;
-            $detalle_ingreso->save();
+
+            // actualizar stock lotes
+            $cantidad_kilos_restante = $cantidad_kilos;
+            $cantidad_restante = $cantidad;
+            foreach ($detalle_ingresos as $di) {
+                if ($cantidad_kilos_restante == 0 && $cantidad_restante == 0) {
+                    break;
+                }
+                // cantidad kilos
+                if ($cantidad_kilos_restante > 0) {
+                    if ($di->stock_kilos >= $cantidad_kilos_restante) {
+                        $di->stock_kilos = $di->stock_kilos - $cantidad_kilos_restante;
+                        $cantidad_kilos_restante = 0;
+                    } else {
+                        $cantidad_kilos_restante = $cantidad_kilos_restante - $di->stock_kilos;
+                        $di->stock_kilos = 0;
+                    }
+                }
+                // cantidad cerdos
+                if ($cantidad_restante > 0) {
+                    if ($di->stock_cantidad >= $cantidad_restante) {
+                        $di->stock_cantidad = $di->stock_cantidad - $cantidad_restante;
+                        $cantidad_restante = 0;
+                    } else {
+                        $cantidad_restante = $cantidad_restante - $di->stock_cantidad;
+                        $di->stock_cantidad = 0;
+                    }
+                }
+                $di->save();
+            }
             // stock del producto
-            $producto = $detalle_ingreso->producto;
             $producto->stock_actual = (float)$producto->stock_actual - (float)$merma->cantidad_kilos;
             $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad - (float)$merma->cantidad;
             $producto->save();
@@ -84,17 +118,19 @@ class MermaController extends Controller
 
     public function update(Merma $merma, Request $request)
     {
-        if ($merma->cantidad != $request->cantidad || $merma->cantidad_kilos != $request->cantidad_kilos || $merma->detalle_ingreso_id != $request->detalle_ingreso_id) {
+        if ($merma->cantidad != $request->cantidad || $merma->cantidad_kilos != $request->cantidad_kilos || $merma->producto_id != $request->producto_id) {
             DB::beginTransaction();
             try {
                 // REVERTIR MERMA
                 // stock del PRODUCTO
-                $producto = $merma->detalle_ingreso->producto;
+                $producto = $merma->producto;
                 $producto->stock_actual = (float)$producto->stock_actual + (float)$merma->cantidad_kilos;
                 $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad + (float)$merma->cantidad;
                 $producto->save();
                 // stock del detalle ingreso
-                $detalle_ingreso = $merma->detalle_ingreso;
+                $detalle_ingreso = DetalleIngreso::where("ingreso_producto_id", $merma->ingreso_producto_id)
+                    ->where("producto_id", $request->producto_id)
+                    ->get()->last();
                 $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos + (float)$merma->cantidad_kilos;
                 $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad + (float)$merma->cantidad;
                 $detalle_ingreso->save();
@@ -104,15 +140,45 @@ class MermaController extends Controller
                 $request["porcentaje"] = ((float)$request->cantidad_kilos * 100) / $producto->stock_actual;
                 $merma->update(array_map('mb_strtoupper', $request->all()));
 
+                $detalle_ingresos = DetalleIngreso::where("ingreso_producto_id", $request->ingreso_producto_id)
+                    ->where("producto_id", $request->producto_id)
+                    ->where("stock_kilos", ">", 0)
+                    ->where("stock_cantidad", ">", 0)
+                    ->get();
+
                 $merma_actualizado = Merma::find($merma->id);
                 // stock del detalle ingreso
-                $detalle_ingreso = $merma_actualizado->detalle_ingreso;
-                $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos - (float)$merma->cantidad_kilos;
-                $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad - (float)$merma->cantidad;
-                $detalle_ingreso->save();
-
+                // actualizar stock lotes
+                $cantidad_kilos_restante = $merma_actualizado->cantidad_kilos;
+                $cantidad_restante = $merma_actualizado->cantidad;
+                foreach ($detalle_ingresos as $di) {
+                    if ($cantidad_kilos_restante == 0 && $cantidad_restante == 0) {
+                        break;
+                    }
+                    // cantidad kilos
+                    if ($cantidad_kilos_restante > 0) {
+                        if ($di->stock_kilos >= $cantidad_kilos_restante) {
+                            $di->stock_kilos = $di->stock_kilos - $cantidad_kilos_restante;
+                            $cantidad_kilos_restante = 0;
+                        } else {
+                            $cantidad_kilos_restante = $cantidad_kilos_restante - $di->stock_kilos;
+                            $di->stock_kilos = 0;
+                        }
+                    }
+                    // cantidad cerdos
+                    if ($cantidad_restante > 0) {
+                        if ($di->stock_cantidad >= $cantidad_restante) {
+                            $di->stock_cantidad = $di->stock_cantidad - $cantidad_restante;
+                            $cantidad_restante = 0;
+                        } else {
+                            $cantidad_restante = $cantidad_restante - $di->stock_cantidad;
+                            $di->stock_cantidad = 0;
+                        }
+                    }
+                    $di->save();
+                }
                 // stock del PRODUCTO
-                $producto = $merma_actualizado->detalle_ingreso->producto;
+                $producto = $merma_actualizado->producto;
                 $producto->stock_actual = (float)$producto->stock_actual - (float)$merma->cantidad_kilos;
                 $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad - (float)$merma->cantidad;
                 $producto->save();
@@ -136,17 +202,21 @@ class MermaController extends Controller
     public function destroy(Merma $merma)
     {
         // REVERTIR MERMA
-        $detalle_ingreso = $merma->detalle_ingreso;
-        $producto = $merma->detalle_ingreso->producto;
+        $producto = $merma->producto;
 
         // stock del DETALLE DEL LOTE
-        $detalle_ingreso->stock_actual = (float)$detalle_ingreso->stock_actual + (float)$merma->cantidad;
+        $detalle_ingreso = DetalleIngreso::where("ingreso_producto_id", $merma->ingreso_producto_id)
+            ->where("producto_id", $merma->producto_id)
+            ->get()->last();
+        $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos + (float)$merma->cantidad_kilos;
+        $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad + (float)$merma->cantidad;
         $detalle_ingreso->save();
         // stock del PRODUCTO
-        $producto->stock_actual = (float)$producto->stock_actual + (float)$merma->cantidad;
+        $producto->stock_actual = (float)$producto->stock_actual + (float)$merma->cantidad_kilos;
+        $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad + (float)$merma->cantidad;
         $producto->save();
         // actualizar kardex
-        KardexProducto::registroSoloIngreso($producto, $merma->cantidad, $detalle_ingreso, "INGRESO DE PRODUCTO POR CORRECIÓN/ELIMINACIÓN DE REGISTRO MERMA");
+        KardexProducto::registroSoloIngreso($producto, $merma->cantidad_kilos, 0, "INGRESO DE PRODUCTO POR CORRECIÓN/ELIMINACIÓN DE REGISTRO MERMA");
 
         $merma->delete();
         return redirect()->route('mermas.index')->with('bien', 'Registro eliminado correctamente');
