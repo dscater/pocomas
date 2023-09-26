@@ -58,19 +58,25 @@ class Venta extends Model
                 for ($k = 0; $k < count($array_id_lotes); $k++) {
                     $detalle_ingreso = DetalleIngreso::find($array_id_lotes[$k]);
                     // SI ES ANTICIPO RESTABLECER COMO DISPONIBLE EL STOCK DEL DETALLE
-                    if ($venta->tipo_venta == "ANTICIPOS" && $venta->saldo > 0) {
-                        $detalle_ingreso->anticipo_kilos = (float)$detalle_ingreso->anticipo_kilos + (float)$array_cantidad_kilos_lotes[$k];
-                        $detalle_ingreso->anticipo = (float)$detalle_ingreso->anticipo + (float)$array_cantidad_lotes[$k];
-                        $detalle_ingreso->save();
-                        // incrementar stock lote-detalle
-                        $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos + (float)$array_cantidad_kilos_lotes[$k];
-                        $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad + (float)$array_cantidad_lotes[$k];
-                        $detalle_ingreso->save();
-                        // incrementar stock producto
-                        $producto = $detalle_ingreso->producto;
-                        $producto->stock_actual = (float)$producto->stock_actual + (float)$array_cantidad_kilos_lotes[$k];
-                        $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad + (float)$array_cantidad_lotes[$k];
-                        $producto->save();
+                    if ($venta->tipo_venta == "ANTICIPOS") {
+                        if ($venta->saldo > 0) {
+                            $detalle_ingreso->anticipo_kilos = (float)$detalle_ingreso->anticipo_kilos - (float)$array_cantidad_kilos_lotes[$k];
+                            $detalle_ingreso->anticipo = (float)$detalle_ingreso->anticipo - (float)$array_cantidad_lotes[$k];
+                            $detalle_ingreso->save();
+                        } else {
+                            $detalle_ingreso->anticipo_kilos = (float)$detalle_ingreso->anticipo_kilos + (float)$array_cantidad_kilos_lotes[$k];
+                            $detalle_ingreso->anticipo = (float)$detalle_ingreso->anticipo + (float)$array_cantidad_lotes[$k];
+                            $detalle_ingreso->save();
+                            // incrementar stock lote-detalle
+                            $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos + (float)$array_cantidad_kilos_lotes[$k];
+                            $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad + (float)$array_cantidad_lotes[$k];
+                            $detalle_ingreso->save();
+                            // incrementar stock producto
+                            $producto = $detalle_ingreso->producto;
+                            $producto->stock_actual = (float)$producto->stock_actual + (float)$array_cantidad_kilos_lotes[$k];
+                            $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad + (float)$array_cantidad_lotes[$k];
+                            $producto->save();
+                        }
                     }
                 }
             }
@@ -106,10 +112,30 @@ class Venta extends Model
                 for ($k = 0; $k < count($array_id_lotes); $k++) {
                     $detalle_ingreso = DetalleIngreso::find($array_id_lotes[$k]);
                     // SI ES ANTICIPO RESTABLECER COMO DISPONIBLE EL STOCK DEL DETALLE
-                    if ($venta->tipo_venta == "ANTICIPOS" && $venta->saldo > 0) {
-                        $detalle_ingreso->anticipo_kilos = (float)$detalle_ingreso->anticipo_kilos - (float)$array_cantidad_kilos_lotes[$k];
-                        $detalle_ingreso->anticipo = (float)$detalle_ingreso->anticipo - (float)$array_cantidad_lotes[$k];
-                        $detalle_ingreso->save();
+                    if ($venta->tipo_venta == "ANTICIPOS") {
+                        if ($venta->saldo > 0) {
+                            $detalle_ingreso->anticipo_kilos = (float)$detalle_ingreso->anticipo_kilos - (float)$array_cantidad_kilos_lotes[$k];
+                            $detalle_ingreso->anticipo = (float)$detalle_ingreso->anticipo - (float)$array_cantidad_lotes[$k];
+                            $detalle_ingreso->save();
+                        } else {
+                            // saldo cancelado eliminar ingreso
+                            $ingreso_caja = IngresoCaja::where("tipo", "CANCELACIÓN DE ANTICIPO")
+                                ->where("registro_id", $venta->id)->get()->first();
+
+                            if ($ingreso_caja) {
+                                // eliminar y restablecer stock de producto
+                                // incrementar stock lote-detalle
+                                $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos + (float)$array_cantidad_kilos_lotes[$k];
+                                $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad + (float)$array_cantidad_lotes[$k];
+                                $detalle_ingreso->save();
+                                // incrementar stock producto
+                                $producto = $detalle_ingreso->producto;
+                                $producto->stock_actual = (float)$producto->stock_actual + (float)$array_cantidad_kilos_lotes[$k];
+                                $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad + (float)$array_cantidad_lotes[$k];
+                                $producto->save();
+                                $ingreso_caja->delete();
+                            }
+                        }
                     } else {
                         // incrementar stock lote-detalle
                         $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos + (float)$array_cantidad_kilos_lotes[$k];

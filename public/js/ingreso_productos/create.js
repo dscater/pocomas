@@ -14,10 +14,10 @@ let contenedor_filas = $("#contenedor_filas");
 let btnAgregar = $("#btnAgregar");
 let btnRegistrar = $("#btnRegistrar");
 
-let producto_id = $('#producto_id');
-let kilos = $('#kilos');
-let cantidad = $('#cantidad');
-let precio_compra = $('#precio_compra');
+let producto_id = $("#producto_id");
+let kilos = $("#kilos");
+let cantidad = $("#cantidad");
+let precio_compra = $("#precio_compra");
 
 let precio_total = $("#precio_total");
 let total_kilos = $("#total_kilos");
@@ -56,7 +56,7 @@ function enumeraFilas() {
     let filas = contenedor_filas.children(".fila");
     let numero_fila = 1;
     filas.each(function () {
-        $(this).children('td').eq(0).text(numero_fila++);
+        $(this).children("td").eq(0).text(numero_fila++);
     });
 }
 
@@ -68,39 +68,75 @@ function calculaTotal() {
         let s_total_cantidad = 0;
         filas.each(function () {
             // subtotal
-            let kilos = parseFloat($(this).children("td").eq(2).children("span").text());
-            let cantidad = parseFloat($(this).children("td").eq(3).children("span").text());
+            let kilos = parseFloat(
+                $(this).children("td").eq(2).children("span").text()
+            );
+            let cantidad = parseFloat(
+                $(this).children("td").eq(3).children("span").text()
+            );
             let subtotal = kilos * parseFloat(precio_compra.val());
-            parseFloat($(this).children("td").eq(4).children("span").text(subtotal));
-            parseFloat($(this).children("td").eq(4).children("input").val(subtotal));
+            parseFloat(
+                $(this)
+                    .children("td")
+                    .eq(4)
+                    .children("span")
+                    .text(formatearNumero(parseFloat(subtotal).toFixed(2)))
+            );
+            parseFloat(
+                $(this)
+                    .children("td")
+                    .eq(4)
+                    .children("input")
+                    .val(parseFloat(subtotal).toFixed(2))
+            );
             total += subtotal;
             s_total_kilos += kilos;
             s_total_cantidad += cantidad;
         });
-        total_kilos.children('span').text(s_total_kilos);
-        total_kilos.children('input').val(s_total_kilos);
-        total_cantidad.children('span').text(s_total_cantidad);
-        total_cantidad.children('input').val(s_total_cantidad);
-        precio_total.children('span').text(total.toFixed(2));
-        precio_total.children('input').val(total);
+        total_kilos.children("span").text(s_total_kilos);
+        total_kilos.children("input").val(s_total_kilos);
+        total_cantidad.children("span").text(s_total_cantidad);
+        total_cantidad.children("input").val(s_total_cantidad);
+        precio_total.children("span").text(formatearNumero(total.toFixed(2)));
+        precio_total.children("input").val(total);
     }
 }
 
-
 function agregarProducto() {
-    if (producto_id.val() != "" && kilos.val() != "" && cantidad.val() != "" && precio_compra.val() != "") {
+    if (
+        producto_id.val() != "" &&
+        kilos.val() != "" &&
+        cantidad.val() != "" &&
+        precio_compra.val() != ""
+    ) {
         quitaVacio();
         let nueva_fila = $(fila).clone();
         // AGREGANDO TEXTOS
-        nueva_fila.children('td').eq(1).children("span").text(producto_id.children("option:selected").text());
-        nueva_fila.children('td').eq(2).children("span").text(kilos.val());
-        nueva_fila.children('td').eq(3).children("span").text(cantidad.val());
-        nueva_fila.children('td').eq(4).children("span").text(parseFloat(precio_compra.val()).toFixed(2));
+        nueva_fila
+            .children("td")
+            .eq(1)
+            .children("span")
+            .text(producto_id.children("option:selected").text());
+        nueva_fila.children("td").eq(2).children("span").text(kilos.val());
+        nueva_fila.children("td").eq(3).children("span").text(cantidad.val());
+        nueva_fila
+            .children("td")
+            .eq(4)
+            .children("span")
+            .text(parseFloat(precio_compra.val()).toFixed(2));
         // AGREGANDO VALORES ALOS INPUTS
-        nueva_fila.children('td').eq(1).children("input").val(producto_id.val());
-        nueva_fila.children('td').eq(2).children("input").val(kilos.val());
-        nueva_fila.children('td').eq(3).children("input").val(cantidad.val());
-        nueva_fila.children('td').eq(4).children("input").val(precio_compra.val());
+        nueva_fila
+            .children("td")
+            .eq(1)
+            .children("input")
+            .val(producto_id.val());
+        nueva_fila.children("td").eq(2).children("input").val(kilos.val());
+        nueva_fila.children("td").eq(3).children("input").val(cantidad.val());
+        nueva_fila
+            .children("td")
+            .eq(4)
+            .children("input")
+            .val(precio_compra.val());
 
         // AGREGAR NUEVA FILA
         contenedor_filas.append(nueva_fila);
@@ -114,7 +150,7 @@ function agregarProducto() {
             icon: "error",
             text: "Debes completar todos los campos para agregar un producto al lote",
             confirmButtonText: "Aceptar",
-            confirmButtonColor: "#bd2130"
+            confirmButtonColor: "#bd2130",
         });
     }
 }
@@ -127,12 +163,28 @@ function limpiaCampos() {
 
 function eliminaFila() {
     let fila = $(this).parents(".fila");
-    if (fila.hasClass('existe')) {
+    if (fila.hasClass("existe")) {
         nuevo_eliminado = $(input_eliminado).clone();
-        nuevo_eliminado.val(fila.attr('data-id'));
+        nuevo_eliminado.val(fila.attr("data-id"));
         eliminados.append(nuevo_eliminado);
     }
     fila.remove();
     enumeraFilas();
     validaFilas();
+}
+
+function formatearNumero(numero) {
+    // Convierte el número a una cadena
+    var numeroString = numero.toString();
+
+    // Divide la cadena en parte entera y decimal
+    var partes = numeroString.split(".");
+
+    // Formatea la parte entera con comas para separar los miles
+    partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    // Combina las partes formateadas nuevamente en una sola cadena
+    var numeroFormateado = partes.join(".");
+
+    return numeroFormateado;
 }

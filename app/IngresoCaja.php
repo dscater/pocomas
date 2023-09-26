@@ -10,7 +10,21 @@ class IngresoCaja extends Model
         'caja_id', 'inicio_caja_id', 'tipo_movimiento', 'tipo', 'registro_id', 'monto_total', 'concepto_id', 'fecha', 'hora', 'sw_egreso', 'estado', "user_id"
     ];
 
-    protected $appends = ["descripcion_txt"];
+    protected $appends = ["descripcion_txt", "sin_confirmar_anticipo"];
+
+    public function getSinConfirmarAnticipoAttribute()
+    {
+        if ($this->tipo == 'ANTICIPO VENTA') {
+            $existe_cancelacion = IngresoCaja::where("tipo", "CANCELACIÓN DE ANTICIPO")
+                ->where("registro_id", $this->registro_id)
+                ->get()
+                ->first();
+            if ($existe_cancelacion) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public function getDescripcionTxtAttribute()
     {
@@ -24,6 +38,13 @@ class IngresoCaja extends Model
             $cuenta_pago = CuentaPago::where("id", $this->registro_id)->get()->first();
             if ($cuenta_pago) {
                 return $this->tipo . ' (' . $cuenta_pago->tipo_cobro . ')';
+            }
+        }
+
+        if ($this->tipo == 'ANTICIPO VENTA' || $this->tipo == 'CANCELACIÓN DE ANTICIPO') {
+            $venta = Venta::where("id", $this->registro_id)->get()->first();
+            if ($venta) {
+                return $this->tipo . ' (VENTA NRO.: ' . $venta->id . ')';
             }
         }
         return $this->tipo;
@@ -61,13 +82,13 @@ class IngresoCaja extends Model
                 // Venta
                 $venta = $ingreso_caja->venta;
                 if ($ingreso_caja->tipo == 'CANCELACIÓN DE ANTICIPO') {
+                    Venta::eliminarVentaConfirmacionAnticipo($venta);
                     // restaurar saldo actual
                     $anticipo =  (float)$venta->monto_total - (float)$ingreso_caja->monto_total;
                     $venta->anticipo = $anticipo;
                     $saldo = (float)$venta->monto_total - (float)$anticipo;
                     $venta->saldo = $saldo;
                     $venta->save();
-                    Venta::eliminarVentaConfirmacionAnticipo($venta);
                     $ingreso_caja->delete();
                     return 1;
                 } else {

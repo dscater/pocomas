@@ -46,7 +46,8 @@
             <!-- /.row -->
         </div>
     </section>
-    <input type="hidden" value="{{ route('ingreso_productos.getProductosLoteSumado') }}?stock=true" id="url_productos_lote">
+    <input type="hidden" value="{{ route('ingreso_productos.getProductosLoteSumado') }}?stock=true"
+        id="url_productos_lote">
 @endsection
 @section('scripts')
     <script>
@@ -65,7 +66,7 @@
                     },
                     dataType: "json",
                     success: function(response) {
-                        producto_id.html(response);
+                        producto_id.html(response.html);
                     }
                 });
             } else {

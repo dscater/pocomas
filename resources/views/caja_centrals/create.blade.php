@@ -52,17 +52,18 @@
     <script>
         let concepto_id = $("#concepto_id");
         let ingreso_producto_id = $("#ingreso_producto_id");
+        let check_lote = $("#check_lote");
         $(document).ready(function() {
-            verificaConcepto();
-            concepto_id.change(verificaConcepto)
+            verificaCheckLote();
+            check_lote.change(verificaCheckLote)
         });
 
-        function verificaConcepto() {
-            if (concepto_id.val() == 0 && concepto_id.val() != "") {
-                ingreso_producto_id.parents(".contenedor_lote").removeClass("oculto");
+        function verificaCheckLote() {
+            if (check_lote.prop("checked")) {
+                ingreso_producto_id.removeClass("oculto");
                 ingreso_producto_id.prop("required", true);
             } else {
-                ingreso_producto_id.parents(".contenedor_lote").addClass("oculto");
+                ingreso_producto_id.addClass("oculto");
                 ingreso_producto_id.removeAttr("required");
             }
         }

@@ -6,6 +6,7 @@ use App\CajaCentral;
 use App\CuentaPagar;
 use App\IngresoProducto;
 use App\Proveedor;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -46,6 +47,20 @@ class CuentaPagarController extends Controller
     {
         DB::beginTransaction();
         try {
+            $saldo_caja = CajaCentral::getSaldoCaja();
+            $saldo_banco = CajaCentral::getSaldoBanco();
+
+            if ($request->tipo_pago == 'CAJA') {
+                if ((float)$saldo_caja < (float)$request->monto_total) {
+                    throw new Exception("El saldo en CAJA es insuficiente para realizar el pago. Saldo actual: " . $saldo_caja);
+                }
+            }
+            if ($request->tipo_pago == 'BANCO') {
+                if ((float)$saldo_banco < (float)$request->monto_total) {
+                    throw new Exception("El saldo en BANCO es insuficiente para realizar el pago. Saldo actual: " . $saldo_banco);
+                }
+            }
+
             $data = $request->data;
             foreach ($data as $value) {
                 $ingreso_producto = IngresoProducto::findOrFail($value["id"]);

@@ -71,6 +71,64 @@ $(document).ready(function () {
 
     monto_recibido.on("keyup change", calculaCambio);
 
+    btnRegistrarVenta.click(function () {
+        btnRegistrarVenta.prop("disabled", true);
+        if (
+            input_nit.val() != "" &&
+            cliente_id.val() != "" &&
+            tipo_venta.val() != ""
+        ) {
+            if (tipo_venta.val() == "ANTICIPOS") {
+                if (
+                    $("#anticipo").val() != "" &&
+                    parseFloat($("#anticipo").val()) != 0
+                ) {
+                    $("#formulario").submit();
+                } else {
+                    swal.fire({
+                        title: "Error",
+                        icon: "error",
+                        text: `Debes indicar el MONTO DE ANTICIPO`,
+                        confirmButtonText: "Aceptar",
+                        confirmButtonColor: "#bd2130",
+                    });
+                    setTimeout(function () {
+                        btnRegistrarVenta.removeAttr("disabled");
+                    }, 400);
+                }
+            } else if (tipo_venta.val() == "AL CONTADO") {
+                if (
+                    $("#monto_recibido").val() != "" &&
+                    parseFloat($("#monto_recibido").val()) != 0
+                ) {
+                    $("#formulario").submit();
+                } else {
+                    swal.fire({
+                        title: "Error",
+                        icon: "error",
+                        text: `Debes indicar el MONTO RECIBIDO`,
+                        confirmButtonText: "Aceptar",
+                        confirmButtonColor: "#bd2130",
+                    });
+                    setTimeout(function () {
+                        btnRegistrarVenta.removeAttr("disabled");
+                    }, 400);
+                }
+            } else {
+                $("#formulario").submit();
+            }
+        } else {
+            btnRegistrarVenta.removeAttr("disabled");
+            swal.fire({
+                title: "Error",
+                icon: "error",
+                text: `Debes ingresar todos los campos C.I., Cliente y Tipo de Venta`,
+                confirmButtonText: "Aceptar",
+                confirmButtonColor: "#bd2130",
+            });
+        }
+    });
+
     btnRegistraCliente.click(function () {
         registrarCliente();
     });
@@ -83,7 +141,7 @@ $(document).ready(function () {
                 data: { id: select_ingreso_producto.val() },
                 dataType: "json",
                 success: function (response) {
-                    select_producto.html(response);
+                    select_producto.html(response.html);
                 },
             });
         } else {

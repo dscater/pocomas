@@ -22,7 +22,6 @@ class CajaCentralController extends Controller
     {
         $conceptos = Concepto::all();
         $array_conceptos[""] = "Seleccione...";
-        $array_conceptos[0] = "LOTE";
         foreach ($conceptos as $value) {
             $array_conceptos[$value->id] = $value->nombre;
         }
@@ -51,10 +50,9 @@ class CajaCentralController extends Controller
         }
         $request["fecha_registro"] = date("Y-m-d");
 
-        if ($request->concepto_id != 0) {
+        if (!isset($request->check_lote) || $request->check_lote != "si") {
             $request["ingreso_producto_id"] = 0;
         }
-
         CajaCentral::create(array_map("mb_strtoupper", $request->all()));
         return redirect()->route('caja_centrals.index')->with('bien', 'Registro realizado con éxito');
     }
@@ -63,7 +61,6 @@ class CajaCentralController extends Controller
     {
         $conceptos = Concepto::all();
         $array_conceptos[""] = "Seleccione...";
-        $array_conceptos[0] = "LOTE";
         foreach ($conceptos as $value) {
             $array_conceptos[$value->id] = $value->nombre;
         }
@@ -77,6 +74,9 @@ class CajaCentralController extends Controller
     }
     public function update(CajaCentral $caja_central, Request $request)
     {
+        if (!isset($request->check_lote) || $request->check_lote != "si") {
+            $request["ingreso_producto_id"] = 0;
+        }
         $caja_central->update(array_map("mb_strtoupper", $request->all()));
         return redirect()->route('caja_centrals.index')->with('bien', 'Registro actualizado');
     }

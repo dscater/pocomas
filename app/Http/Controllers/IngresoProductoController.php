@@ -133,7 +133,7 @@ class IngresoProductoController extends Controller
             if ($request->tipo == 'AL CONTADO') {
                 $request['saldo'] = 0;
             }
-            $ingreso_producto->update(array_map('mb_strtoupper', $request->except('productos', 'cantidades', 'kilos', 'control_stock', 'precios', 'eliminados')));
+            $ingreso_producto->update(array_map('mb_strtoupper', $request->except('productos', 'cantidades', 'kilos', 'precios', 'eliminados')));
 
             $eliminados = $request->eliminados;
             if (isset($eliminados)) {
@@ -155,7 +155,6 @@ class IngresoProductoController extends Controller
             $cantidades = $request->cantidades;
             $kilos = $request->kilos;
             $precios = $request->precios;
-            $control_stock = $request->control_stock;
 
             if (isset($productos)) {
                 for ($i = 0; $i < count($productos); $i++) {
@@ -171,7 +170,6 @@ class IngresoProductoController extends Controller
                         'producto_id'  => $producto->id,
                         'kilos'  => $kilos[$i],
                         'cantidad'  => $cantidades[$i],
-                        'tipo_control'  => $control_stock[$i],
                         'stock_kilos'  => $kilos[$i],
                         'stock_cantidad'  => $cantidades[$i],
                         'precio_compra'  => $precios[$i],
@@ -252,11 +250,39 @@ class IngresoProductoController extends Controller
     public function getProductosLoteSumado(Request $request)
     {
         $productos = DetalleIngreso::select("producto_id")->where("ingreso_producto_id", $request->id)->distinct("producto_id")->get();
-        $html = '<option value="">Seleccione...</option>';
+        $html = '<optgroup label="- PRODUCTOS DEL LOTE:">';
+        $html .= '<option value="">Seleccione...</option>';
         foreach ($productos as $value) {
             $producto = Producto::find($value->producto_id);
             $html .= '<option value="' . $producto->id . '">' . $producto->nombre . '</option>';
         }
-        return response()->JSON($html);
+        $html .= '</optgroup>';
+
+        // VERIFICAR SI TIENE EL PRODUCTO PRINICPAL EN EL LOTE
+        $producto_principal = Producto::where("prioridad", "PRINCIPAL")->where("status", 1)
+            ->where("estado", "ACTIVO")->get()->first();
+        $tiene_principal = false;
+        $html_del_principal = '<option value="">Seleccione...</option>';
+        if ($producto_principal) {
+            // buscamos en el detalle de ingreso del lote
+            $existe_principal = [];
+            $existe_principal = DetalleIngreso::where("ingreso_producto_id", $request->id)
+                ->where("producto_id", $producto_principal->id)->get();
+            if (count($existe_principal) > 0) {
+                // armar un nuevo conjunto de opciones con productos con prioridad DEL PRINCIPAL
+                $del_principal = Producto::where("prioridad", "DEL PRINCIPAL")->get();
+                $html .= '<optgroup label="- DEL PRINCIPAL:">';
+                foreach ($del_principal as $value) {
+                    $html .= '<option value="' . $value->id . '">' . $value->nombre . '</option>';
+                }
+                $html .= '</optgroup>';
+            }
+        }
+
+        return response()->JSON([
+            "html" => $html,
+            "tiene_principal" => $tiene_principal,
+            "html_del_principal" => $html_del_principal
+        ]);
     }
 }

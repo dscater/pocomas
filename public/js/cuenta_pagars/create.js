@@ -41,6 +41,7 @@ $(document).ready(function () {
                             tipo_pago: $("#tipo_pago").val(),
                             data: prepararEnvio(),
                             descripcion: $("#descripcion").val(),
+                            monto_total: $("#i_total_cancelar").val(),
                         },
                         dataType: "json",
                         success: function (response) {

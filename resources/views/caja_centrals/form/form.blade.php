@@ -17,10 +17,12 @@
             {{ Form::select('concepto_id', $array_conceptos, null, ['class' => 'form-control', 'required', 'id' => 'concepto_id']) }}
         </div>
     </div>
-    <div class="col-md-4 contenedor_lote oculto">
+    <div class="col-md-4">
         <div class="form-group">
-            <label>Seleccione lote*</label>
-            {{ Form::select('ingreso_producto_id', $array_lotes, null, ['class' => 'form-control', 'id' => 'ingreso_producto_id', 'required']) }}
+            <label for="check_lote">Seleccionar lote <input type="checkbox" name="check_lote" value="si"
+                    {{ isset($caja_central) && $caja_central->ingreso_producto_id != 0 ? 'checked' : '' }}
+                    id="check_lote"></label>
+            {{ Form::select('ingreso_producto_id', $array_lotes, null, ['class' => 'form-control contenedor_lote', 'id' => 'ingreso_producto_id', 'required']) }}
         </div>
     </div>
 

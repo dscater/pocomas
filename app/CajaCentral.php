@@ -10,6 +10,16 @@ class CajaCentral extends Model
         'fecha', 'monto', 'descripcion', 'concepto_id', 'ingreso_producto_id', 'cuenta_pagar_id', 'tipo', 'sw_egreso', 'tipo_transaccion', 'fecha_registro',
     ];
 
+    protected $appends = ["modificable"];
+
+    public function getModificableAttribute()
+    {
+        if (strpos($this->descripcion, "INGRESO POR CIERRE") == false && strpos($this->descripcion, "INGRESO POR CUENTA POR COBRAR") == false && $this->concepto_id != 0) {
+            return true;
+        }
+        return false;
+    }
+
     public static function getSaldo()
     {
         $ingreso_total = CajaCentral::where('tipo', 'INGRESO')->sum("monto");
