@@ -190,7 +190,6 @@ class Venta extends Model
                 $venta->cuenta_cobrar->status = 0;
                 $venta->cuenta_cobrar->save();
             }
-
             // anticipos
             $ingreso_caja = IngresoCaja::where("registro_id", $venta->id)->where("tipo", "ANTICIPO VENTA")->get()->first();
             if ($ingreso_caja) {
