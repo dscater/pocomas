@@ -16,6 +16,7 @@ use App\KardexProducto;
 use App\IngresoProducto;
 use App\IngresoCaja;
 use App\CuentaCobrar;
+use App\CuentaCobrarDetalle;
 use App\DetalleIngreso;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade as PDF;
@@ -33,7 +34,7 @@ class VentaController extends Controller
             $ventas = Venta::where('estado', 1)
                 ->where('caja_id', Auth::user()->caja->caja_id)->get();
         } else if (Auth::user()->tipo == 'ADMINISTRADOR') {
-            $ventas = Venta::where('estado', 1)->get();
+            $ventas = Venta::whereIn('estado', [1, 2])->get();
         }
         return view('ventas.index', compact('ventas'));
     }
@@ -399,14 +400,31 @@ class VentaController extends Controller
     {
         DB::beginTransaction();
         try {
-            if ($venta->cuenta_cobrar) {
-                foreach ($venta->cuenta_cobrar->pagos as $cb_pago) {
-                    $ingreso_caja = IngresoCaja::where("registro_id", $cb_pago->id)->where("tipo", "PAGO POR COBRAR")->get()->first();
-                    if ($ingreso_caja) {
-                        $ingreso_caja->delete();
-                    }
+            // verificar caja cerrada
+            $inicio_caja = InicioCaja::existeInicio(date('Y-m-d'), $venta->caja_id);
+            if (!$inicio_caja || $venta->estado == 2) {
+                throw new Exception("No es posible realizar la eliminación del registro, debido a que la caja " . $venta->caja->nombre . " ya cerró");
+            }
+            // validar por cobrar
+            if ($venta->tipo_venta == 'POR COBRAR') {
+                $cuenta_cobrar = $venta->cuenta_cobrar;
+                $detalles_pagados = CuentaCobrarDetalle::where("cuenta_cobrar_id", $cuenta_cobrar->id)
+                    ->where("cancelado", ">", 0)
+                    ->get();
+                if (count($detalles_pagados) > 0) {
+                    throw new Exception("No es posible eliminar la venta debido a que ya se registraron pagos");
                 }
             }
+
+
+            // if ($venta->cuenta_cobrar) {
+            //     foreach ($venta->cuenta_cobrar->pagos as $cb_pago) {
+            //         $ingreso_caja = IngresoCaja::where("registro_id", $cb_pago->id)->where("tipo", "PAGO POR COBRAR")->get()->first();
+            //         if ($ingreso_caja) {
+            //             $ingreso_caja->delete();
+            //         }
+            //     }
+            // }
 
             // recorrer el detalle de venta
             // registrar como INGRESO cada producto
@@ -481,7 +499,7 @@ class VentaController extends Controller
             return redirect()->route('ventas.index')->with('bien', 'Registro eliminado correctamente');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('ventas.index')->with('error', $e->getMessage());
+            return redirect()->route('ventas.index')->with('error_swal', $e->getMessage());
         }
     }
 

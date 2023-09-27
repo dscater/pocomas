@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -92,14 +93,25 @@ class Venta extends Model
     {
         DB::beginTransaction();
         try {
-            if ($venta->cuenta_cobrar) {
-                foreach ($venta->cuenta_cobrar->pagos as $cb_pago) {
-                    $ingreso_caja = IngresoCaja::where("registro_id", $cb_pago->id)->where("tipo", "PAGO POR COBRAR")->get()->first();
-                    if ($ingreso_caja) {
-                        $ingreso_caja->delete();
-                    }
+            // validar por cobrar
+            if ($venta->tipo_venta == 'POR COBRAR') {
+                $cuenta_cobrar = $venta->cuenta_cobrar;
+                $detalles_pagados = CuentaCobrarDetalle::where("cuenta_cobrar_id", $cuenta_cobrar->id)
+                    ->where("cancelado", ">", 0)
+                    ->get();
+                if (count($detalles_pagados) > 0) {
+                    throw new Exception("No es posible eliminar la venta debido a que ya se registraron pagos");
                 }
             }
+
+            // if ($venta->cuenta_cobrar) {
+            //     foreach ($venta->cuenta_cobrar->pagos as $cb_pago) {
+            //         $ingreso_caja = IngresoCaja::where("registro_id", $cb_pago->id)->where("tipo", "PAGO POR COBRAR")->get()->first();
+            //         if ($ingreso_caja) {
+            //             $ingreso_caja->delete();
+            //         }
+            //     }
+            // }
 
             // recorrer el detalle de venta
             // registrar como INGRESO cada producto

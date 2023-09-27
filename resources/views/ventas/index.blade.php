@@ -95,16 +95,16 @@
                                                 <a href="{{ route('ventas.show', $venta->id) }}" class="ir-evaluacion"
                                                     data-toggle="tooltip" title="Factura"><i class="fa fa-file-pdf"></i></a>
 
-                                                {{-- @if (Auth::user()->tipo == 'ADMINISTRADOR')
-                                                    <a href="{{ route('ventas.edit', $venta->id) }}" class="modificar"><i
+                                                @if (Auth::user()->tipo == 'ADMINISTRADOR')
+                                                    {{-- <a href="{{ route('ventas.edit', $venta->id) }}" class="modificar"><i
                                                             class="fa fa-edit" data-toggle="tooltip" data-placement="left"
-                                                            title="Modificar"></i></a>
+                                                            title="Modificar"></i></a> --}}
 
                                                     <a href="#" data-url="{{ route('ventas.destroy', $venta->id) }}"
                                                         data-toggle="modal" data-target="#modal-eliminar"
                                                         class="eliminar"><i class="fa fa-trash" data-toggle="tooltip"
                                                             data-placement="left" title="Eliminar"></i></a>
-                                                @endif --}}
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
