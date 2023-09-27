@@ -473,6 +473,13 @@ class VentaController extends Controller
             }
 
             if ($venta->cuenta_cobrar) {
+                $cuenta_cliente = $cuenta_cobrar->cuenta_cliente;
+                $cuenta_cliente->total_deuda = (float)$cuenta_cliente->total_deuda - $venta->monto_total;
+                $cuenta_cliente->saldo = (float)$cuenta_cliente->saldo - $venta->monto_total;
+                if ($cuenta_cliente->saldo <= 0) {
+                    $cuenta_cliente->estado = 'CANCELADO';
+                }
+                $cuenta_cliente->save();
                 $venta->cuenta_cobrar->status = 0;
                 $venta->cuenta_cobrar->save();
             }
