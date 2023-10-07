@@ -189,6 +189,21 @@ class LoteProductoController extends Controller
     {
         DB::beginTransaction();
         try {
+            if ($ingreso_producto->existe_ventas) {
+                throw new Exception("No es posible eliminar el registro debido a que existen ventas que utilizaron productos del lote: " . $ingreso_producto->nro_lote);
+            }
+
+
+            if ($ingreso_producto->existe_pagos) {
+                throw new Exception("No es posible eliminar el registro debido a que existen pagos realizados del lote: " . $ingreso_producto->nro_lote);
+            }
+
+
+            // eliminar cuenta pagar
+            $cuenta_pagar = $ingreso_producto->cuenta_pagars;
+            $cuenta_pagar->cuenta_pagar_detalles()->delete();
+            $cuenta_pagar->delete();
+
             foreach ($ingreso_producto->detalle_ingresos as $di) {
                 $cantidad_anterior_kilos = (float)$di->stock_kilos;
                 $cantidad_anterior = (float)$di->stock_cantidad;
@@ -201,8 +216,6 @@ class LoteProductoController extends Controller
             }
             $ingreso_producto->estado = 0;
             $ingreso_producto->save();
-            // add
-            $ingreso_producto->cuenta_pagars->delete();
             DB::commit();
             return redirect()->route('lote_productos.index')->with('bien', 'Registro eliminado correctamente');
         } catch (\Exception $e) {
