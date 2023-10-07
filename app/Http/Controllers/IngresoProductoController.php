@@ -11,12 +11,14 @@ use App\IngresoProducto;
 use App\Producto;
 use App\KardexProducto;
 use App\Proveedor;
+use Exception;
 use Illuminate\Support\Facades\DB;
 
 class IngresoProductoController extends Controller
 {
     public function index()
     {
+        return redirect()->route("ingreso_productos.create");
         $ingreso_productos = IngresoProducto::where('estado', 1)->get();
         return view('ingreso_productos.index', compact('ingreso_productos'));
     }
@@ -38,42 +40,61 @@ class IngresoProductoController extends Controller
             $array_productos[$value->id] =  $value->nombre;
         }
 
-        return view('ingreso_productos.create', compact('array_productos', 'array_proveedors'));
+        $ingreso_productos = IngresoProducto::where('estado', 1)
+            ->where("saldo_kilos", ">", 0)
+            ->where("saldo_cantidad", ">", 0)
+            ->get();
+
+        $ingreso_productos_vacios = IngresoProducto::where('estado', 1)
+            ->where("saldo_kilos", "=", 0)
+            ->orWhere("saldo_cantidad", "=", 0)
+            ->get();
+
+
+        return view('ingreso_productos.create', compact('array_productos', 'array_proveedors', 'ingreso_productos', 'ingreso_productos_vacios'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            "nro_lote" => "required",
-            "proveedor_id" => "required",
-            "tipo" => "required",
-            "fecha_ingreso" => "required",
+            "ingreso_producto_id" => "required",
         ]);
+
         DB::beginTransaction();
         try {
-            $request['fecha_registro'] = date('Y-m-d');
-            $request['estado'] = 1;
-            $request['saldo'] = $request->precio_total;
-            if ($request->tipo == 'AL CONTADO') {
-                $request['saldo'] = 0;
-            }
-            $nuevo_ingreso = IngresoProducto::create(array_map('mb_strtoupper', $request->except('productos', 'cantidades', 'kilos', 'precios')));
-
+            $ingreso_producto = IngresoProducto::find($request->ingreso_producto_id);
+            $detalle_principal = DetalleIngreso::where("ingreso_producto_id", $ingreso_producto->id)
+                ->where("producto_id", $ingreso_producto->producto_id)
+                ->get()->first();
+            $eliminados = $request->eliminados;
             $productos = $request->productos;
             $cantidades = $request->cantidades;
             $kilos = $request->kilos;
-            $precios = $request->precios;
 
-            // REGISTRAR CUENTA POR PAGAR
-            if ($request->tipo == 'POR PAGAR') {
-                CuentaPagar::create([
-                    "ingreso_producto_id" => $nuevo_ingreso->id,
-                    "proveedor_id" => $nuevo_ingreso->proveedor_id,
-                    "monto_total" => $request->precio_total,
-                    "saldo" => $request->precio_total,
-                    "fecha_registro" => date("Y-m-d"),
-                ]);
+            if (isset($eliminados)) {
+                for ($i = 0; $i < count($eliminados); $i++) {
+                    $detalle_ingreso = DetalleIngreso::find($eliminados[$i]);
+                    //restar la cantidad del ingreso eliminado
+                    $producto = $detalle_ingreso->producto;
+                    $producto->stock_actual = (float)$producto->stock_actual - (float)$detalle_ingreso->kilos;
+                    $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad - (float)$detalle_ingreso->cantidad;
+                    $producto->save();
+                    // registrar egreso
+                    KardexProducto::registroEgreso($producto, $detalle_ingreso->kilos, $detalle_ingreso->id, "EGRESO POR MODIFICACIÓN DE INGRESOS LOTE N° " . $detalle_ingreso->ingreso_producto->nro_lote);
+                    $detalle_ingreso->delete();
+
+                    // REGISTRAR INGRESO DEL PRODUCTO PRINCIPAL
+                    $producto_principal = Producto::find($ingreso_producto->producto_id);
+                    $producto_principal->stock_actual = (float)$producto_principal->stock_actual + (float)$detalle_ingreso->kilos;
+                    $producto_principal->stock_actual_cantidad = (float)$producto_principal->stock_actual_cantidad + (float)$detalle_ingreso->cantidad;
+                    $producto_principal->save();
+                    KardexProducto::registroIngresoLote($producto, $ingreso_producto, "INGRESO POR ACTUALIZACIÓN DEL LOTE N° " . $ingreso_producto->nro_lote);
+                    $detalle_principal->stock_kilos = (float)$detalle_principal->stock_kilos + (float)$detalle_ingreso->kilos;
+                    $detalle_principal->stock_cantidad = (float)$detalle_principal->stock_cantidad + (float)$detalle_ingreso->cantidad;
+                    $detalle_principal->save();
+                }
             }
+
             if (isset($productos)) {
                 for ($i = 0; $i < count($productos); $i++) {
                     // ACTUALIZAR STOCK DEL PRODUCTO
@@ -82,26 +103,40 @@ class IngresoProductoController extends Controller
                     $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad + (float)$cantidades[$i];
                     $producto->save();
 
-                    // REGISTRAR EL INGRESO
+                    // REGISTRAR EL INGRESO DEL DETALLE
                     $detalle_ingreso = DetalleIngreso::create([
-                        'ingreso_producto_id'  => $nuevo_ingreso->id,
+                        'ingreso_producto_id'  => $ingreso_producto->id,
                         'producto_id'  => $producto->id,
                         'kilos'  => $kilos[$i],
                         'cantidad'  => $cantidades[$i],
                         'stock_kilos'  => $kilos[$i],
                         'stock_cantidad'  => $cantidades[$i],
-                        'precio_compra'  => $precios[$i],
                         'anticipo' => 0,
                         'anticipo_kilos' => 0,
                     ]);
-                    KardexProducto::registroIngreso($producto, $nuevo_ingreso, $detalle_ingreso);
+                    KardexProducto::registroIngreso($producto, $ingreso_producto, $detalle_ingreso);
+
+                    // REGISTRAR EGRESOS DEL PRODUCTO PRINCIPAL
+                    $producto_principal = Producto::find($ingreso_producto->producto_id);
+                    $producto_principal->stock_actual = (float)$producto_principal->stock_actual - (float)$kilos[$i];
+                    $producto_principal->stock_actual_cantidad = (float)$producto_principal->stock_actual_cantidad - (float)$cantidades[$i];
+                    $producto_principal->save();
+                    KardexProducto::registroEgreso($producto, (float)$kilos[$i], $ingreso_producto->id, "EGRESO POR DERIVACIÓN DE PRODUCTO(" . $producto->nombre . ")", "IngresoProducto");
+                    $detalle_principal->stock_kilos = (float)$detalle_principal->stock_kilos - (float)$kilos[$i];
+                    $detalle_principal->stock_cantidad = (float)$detalle_principal->stock_cantidad -  (float)$cantidades[$i];
+                    $detalle_principal->save();
+                }
+            } else {
+                if (count($ingreso_producto->detalle_ingresos) == 0) {
+                    throw new Exception("No se pudo realizar el registro debido a que no se ingresaron productos");
                 }
             }
+            IngresoProducto::actualizaSaldoStocks($ingreso_producto->id);
             DB::commit();
-            return redirect()->route('ingreso_productos.index')->with('bien', 'Registro realizado con éxito');
+            return redirect()->route('ingreso_productos.create')->with('bien', 'Registro realizado con éxito');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('ingreso_productos.index')->with('error', 'Ocurrió un error. El registro no se guardo. ' . $e->getMessage());
+            return redirect()->route('ingreso_productos.create')->with('error', 'Ocurrió un error. El registro no se guardo. ' . $e->getMessage());
         }
     }
 
@@ -203,9 +238,14 @@ class IngresoProductoController extends Controller
                 $producto->stock_actual = (float)$producto->stock_actual - (float)$cantidad_anterior_kilos;
                 $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad - (float)$cantidad_anterior;
                 $producto->save();
+
+                KardexProducto::registroEgreso($producto, (float)$cantidad_anterior_kilos, $di->id, "EGRESO POR ELIMINACIÓN DEL LOTE N° " . $ingreso_producto->nro_lote, "IngresoProducto");
             }
             $ingreso_producto->estado = 0;
             $ingreso_producto->save();
+
+            // add
+            $ingreso_producto->cuenta_pagars->delete();
             DB::commit();
             return redirect()->route('ingreso_productos.index')->with('bien', 'Registro eliminado correctamente');
         } catch (\Exception $e) {
@@ -249,40 +289,38 @@ class IngresoProductoController extends Controller
 
     public function getProductosLoteSumado(Request $request)
     {
-        $productos = DetalleIngreso::select("producto_id")->where("ingreso_producto_id", $request->id)->distinct("producto_id")->get();
-        $html = '<optgroup label="- PRODUCTOS DEL LOTE:">';
-        $html .= '<option value="">Seleccione...</option>';
-        foreach ($productos as $value) {
-            $producto = Producto::find($value->producto_id);
-            $html .= '<option value="' . $producto->id . '">' . $producto->nombre . '</option>';
-        }
-        $html .= '</optgroup>';
+        $ingreso_producto = IngresoProducto::find($request->id);
+        $productos = DetalleIngreso::select("producto_id")->where("ingreso_producto_id", $request->id)->where("producto_id", "!=", $ingreso_producto->producto_id)->distinct("producto_id")->get();
 
-        // VERIFICAR SI TIENE EL PRODUCTO PRINICPAL EN EL LOTE
-        $producto_principal = Producto::where("prioridad", "PRINCIPAL")->where("status", 1)
-            ->where("estado", "ACTIVO")->get()->first();
-        $tiene_principal = false;
-        $html_del_principal = '<option value="">Seleccione...</option>';
-        if ($producto_principal) {
-            // buscamos en el detalle de ingreso del lote
-            $existe_principal = [];
-            $existe_principal = DetalleIngreso::where("ingreso_producto_id", $request->id)
-                ->where("producto_id", $producto_principal->id)->get();
-            if (count($existe_principal) > 0) {
-                // armar un nuevo conjunto de opciones con productos con prioridad DEL PRINCIPAL
-                $del_principal = Producto::where("prioridad", "DEL PRINCIPAL")->get();
-                $html .= '<optgroup label="- DEL PRINCIPAL:">';
-                foreach ($del_principal as $value) {
-                    $html .= '<option value="' . $value->id . '">' . $value->nombre . '</option>';
+        $html = '<option value="">- No se encontrarón lotes registrados -</option>';
+        $producto_principal = $ingreso_producto->producto;
+        if (count($productos) > 0 || $producto_principal) {
+            $html = "";
+            if (count($productos) > 0) {
+                $html .= '<optgroup label="PRODUCTOS DERRIVADOS:">';
+                $html .= '<option value="">Seleccione...</option>';
+                foreach ($productos as $value) {
+                    $producto = Producto::find($value->producto_id);
+                    $html .= '<option value="' . $producto->id . '">' . $producto->nombre . '</option>';
                 }
                 $html .= '</optgroup>';
             }
+            // VERIFICAR SI TIENE EL PRODUCTO PRINICPAL EN EL LOTE
+            $tiene_principal = false;
+            if ($producto_principal && $ingreso_producto->producto_principal->stock_kilos > 0 && $ingreso_producto->producto_principal->stock_cantidad > 0) {
+                if (count($productos) == 0) {
+                    $html .= '<option value="">Seleccione...</option>';
+                }
+                // buscamos en el detalle de ingreso del lote
+                // armar un nuevo conjunto de opciones con productos con prioridad DEL PRINCIPAL
+                $html .= '<optgroup label="PRODUCTO PRINCIPAL:">';
+                $html .= '<option value="' . $producto_principal->id . '">' . $producto_principal->nombre . '</option>';
+                $html .= '</optgroup>';
+            }
         }
-
         return response()->JSON([
             "html" => $html,
             "tiene_principal" => $tiene_principal,
-            "html_del_principal" => $html_del_principal
         ]);
     }
 }

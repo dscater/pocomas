@@ -142,6 +142,8 @@ $(document).ready(function () {
                 dataType: "json",
                 success: function (response) {
                     select_producto.html(response.html);
+                    select_producto.val("");
+                    select_producto.trigger("change");
                 },
             });
         } else {

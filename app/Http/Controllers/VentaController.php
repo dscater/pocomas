@@ -56,6 +56,8 @@ class VentaController extends Controller
         $clientes = Cliente::where('estado', 1)->get();
 
         $lotes = IngresoProducto::where('estado', 1)
+            ->where("saldo_kilos", ">", 0)
+            ->where("saldo_cantidad", ">", 0)
             ->get();
         $array_clientes[''] = 'Buscar...';
         $array_lotes[''] = "Seleccione...";
@@ -186,7 +188,6 @@ class VentaController extends Controller
                         $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos - (float)$array_cantidad_kilos_lotes[$k];
                         $detalle_ingreso->stock_cantidad = (float)$detalle_ingreso->stock_cantidad - (float)$array_cantidad_lotes[$k];
                         $detalle_ingreso->save();
-
                         // stock del PRODUCTO
                         $detalle_ingreso->producto->stock_actual = (float)$detalle_ingreso->producto->stock_actual - (float)$array_cantidad_kilos_lotes[$k];
                         $detalle_ingreso->producto->stock_actual_cantidad = (float)$detalle_ingreso->producto->stock_actual_cantidad - (float)$array_cantidad_lotes[$k];
@@ -201,6 +202,7 @@ class VentaController extends Controller
                 }
             }
 
+            IngresoProducto::actualizaSaldoStocks($detalle_ingreso->ingreso_producto->id);
 
             // registrar factura
             $nro_factura = 1;
@@ -470,6 +472,7 @@ class VentaController extends Controller
                         ]);
                     }
                 }
+                IngresoProducto::actualizaSaldoStocks($detalle_ingreso->ingreso_producto->id);
             }
 
             if ($venta->cuenta_cobrar) {

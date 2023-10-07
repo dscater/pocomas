@@ -113,6 +113,15 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('ingreso_productos/destroy/{ingreso_producto}', 'IngresoProductoController@destroy')->name('ingreso_productos.destroy');
 
+    // LOTE DE PRODUCTOS
+    Route::get('lote_productos/getInfoParaRegistroIngreso', 'LoteProductoController@getInfoParaRegistroIngreso')->name('lote_productos.getInfoParaRegistroIngreso');
+    Route::get('lote_productos', 'LoteProductoController@index')->name('lote_productos.index');
+    Route::get('lote_productos/create', 'LoteProductoController@create')->name('lote_productos.create');
+    Route::post('lote_productos/store', 'LoteProductoController@store')->name('lote_productos.store');
+    Route::get('lote_productos/edit/{ingreso_producto}', 'LoteProductoController@edit')->name('lote_productos.edit');
+    Route::put('lote_productos/update/{ingreso_producto}', 'LoteProductoController@update')->name('lote_productos.update');
+    Route::delete('lote_productos/destroy/{ingreso_producto}', 'LoteProductoController@destroy')->name('lote_productos.destroy');
+
     // CLIENTES
     Route::get('clientes', 'ClienteController@index')->name('clientes.index');
 

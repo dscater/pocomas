@@ -20,20 +20,6 @@
                 <p>Cajas</p>
             </a>
         </li>
-        {{-- <li class="nav-item">
-            <a href="{{ route('inicio_cajas.index') }}"
-                class="nav-link @if (request()->is('inicio_cajas*')) active @endif">
-                <i class="nav-icon fa fa-chevron-right"></i>
-                <p>Inicio de Caja</p>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{{ route('cierre_cajas.index') }}"
-                class="nav-link @if (request()->is('cierre_cajas*')) active @endif">
-                <i class="nav-icon fa fa-chevron-right"></i>
-                <p>Cierre de Caja</p>
-            </a>
-        </li> --}}
         <li class="nav-item">
             <a href="{{ route('ventas.index') }}" class="nav-link @if (request()->is('ventas*')) active @endif">
                 <i class="nav-icon fa fa-chevron-right"></i>
@@ -65,7 +51,7 @@
     </a>
 </li>
 
-<li class="nav-item @if (request()->is('productos*') || request()->is('ingreso_productos*') || request()->is('galerias*')) menu-is-opening menu-open active @endif">
+<li class="nav-item @if (request()->is('productos*') || request()->is('ingreso_productos*')|| request()->is('lote_productos*') || request()->is('galerias*')) menu-is-opening menu-open active @endif">
     <a href="#" class="nav-link">
         <i class="nav-icon fas fa-box"></i>
         <p>Productos <i class="fas fa-angle-left right"></i></p>
@@ -78,7 +64,14 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="{{ route('ingreso_productos.index') }}"
+            <a href="{{ route('lote_productos.index') }}"
+                class="nav-link @if (request()->is('lote_productos*')) active @endif">
+                <i class="nav-icon fa fa-chevron-right"></i>
+                <p>Lotes de Productos</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('ingreso_productos.create') }}"
                 class="nav-link @if (request()->is('ingreso_productos*')) active @endif">
                 <i class="nav-icon fa fa-chevron-right"></i>
                 <p>Ingreso de Productos</p>

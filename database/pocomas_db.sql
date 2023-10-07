@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost:3306
--- Tiempo de generación: 25-09-2023 a las 16:10:04
+-- Tiempo de generación: 07-10-2023 a las 16:52:35
 -- Versión del servidor: 8.0.30
 -- Versión de PHP: 7.4.19
 
@@ -299,7 +299,6 @@ CREATE TABLE `detalle_ingresos` (
   `cantidad` double NOT NULL,
   `stock_kilos` double NOT NULL,
   `stock_cantidad` double NOT NULL,
-  `precio_compra` decimal(24,2) NOT NULL,
   `anticipo` double NOT NULL,
   `anticipo_kilos` double NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -402,9 +401,12 @@ CREATE TABLE `ingreso_productos` (
   `id` bigint UNSIGNED NOT NULL,
   `nro_lote` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `proveedor_id` bigint UNSIGNED NOT NULL,
+  `producto_id` bigint UNSIGNED NOT NULL,
   `tipo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `total_kilos` double NOT NULL,
   `total_cantidad` double NOT NULL,
+  `saldo_kilos` double(8,2) NOT NULL,
+  `saldo_cantidad` double(8,2) NOT NULL,
   `precio_total` decimal(24,2) NOT NULL,
   `descripcion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `saldo` decimal(24,2) NOT NULL,
@@ -445,6 +447,7 @@ CREATE TABLE `kardex_productos` (
   `id` bigint UNSIGNED NOT NULL,
   `producto_id` bigint UNSIGNED NOT NULL,
   `detalle_ingreso_id` bigint UNSIGNED NOT NULL,
+  `modulo` varchar(155) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fecha` date NOT NULL,
   `detalle` varchar(155) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `precio` decimal(24,2) DEFAULT NULL,
@@ -468,8 +471,7 @@ CREATE TABLE `kardex_productos` (
 
 CREATE TABLE `mermas` (
   `id` bigint UNSIGNED NOT NULL,
-  `ingreso_producto_id` bigint UNSIGNED NOT NULL,
-  `producto_id` bigint UNSIGNED NOT NULL,
+  `detalle_ingreso_id` bigint UNSIGNED NOT NULL,
   `fecha` date NOT NULL,
   `cantidad_kilos` double NOT NULL,
   `cantidad` double NOT NULL,
@@ -524,7 +526,6 @@ CREATE TABLE `productos` (
   `stock_actual_cantidad` double NOT NULL,
   `estado` varchar(155) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `foto` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `prioridad` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `fecha_registro` date NOT NULL,
   `status` int NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -535,10 +536,10 @@ CREATE TABLE `productos` (
 -- Volcado de datos para la tabla `productos`
 --
 
-INSERT INTO `productos` (`id`, `codigo`, `nombre`, `descripcion`, `precio`, `stock_minimo`, `stock_actual`, `stock_actual_cantidad`, `estado`, `foto`, `prioridad`, `fecha_registro`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'P001', 'PRODUCTO 1', 'DESC', 40.00, 10, 0, 0, 'ACTIVO', 'producto_default.png', 'NORMAL', '2023-09-25', 1, '2023-09-25 14:44:52', '2023-09-25 16:05:51'),
-(2, 'P002', 'PRODUCTO 2', '', 35.00, 10, 0, 0, 'ACTIVO', 'producto_default.png', 'PRINCIPAL', '2023-09-25', 1, '2023-09-25 14:45:05', '2023-09-25 14:45:05'),
-(3, 'P003', 'PRODUCTO 3', 'DESC 3', 50.00, 10, 0, 0, 'ACTIVO', 'producto_default.png', 'DEL PRINCIPAL', '2023-09-25', 1, '2023-09-25 14:45:17', '2023-09-25 14:45:17');
+INSERT INTO `productos` (`id`, `codigo`, `nombre`, `descripcion`, `precio`, `stock_minimo`, `stock_actual`, `stock_actual_cantidad`, `estado`, `foto`, `fecha_registro`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'P001', 'PRODUCTO 1', 'DESC PROD. 1', 40.00, 10, 0, 0, 'ACTIVO', 'producto_default.png', '2023-10-07', 1, '2023-10-07 16:51:48', '2023-10-07 16:51:48'),
+(2, 'P002', 'PRODUCTO 2', 'P2', 30.00, 10, 0, 0, 'ACTIVO', 'producto_default.png', '2023-10-07', 1, '2023-10-07 16:51:58', '2023-10-07 16:51:58'),
+(3, 'P003', 'PRODUCTO 3', '', 30.50, 10, 0, 0, 'ACTIVO', 'producto_default.png', '2023-10-07', 1, '2023-10-07 16:52:13', '2023-10-07 16:52:13');
 
 -- --------------------------------------------------------
 
@@ -703,9 +704,9 @@ CREATE TABLE `venta_detalles` (
   `id` bigint UNSIGNED NOT NULL,
   `venta_id` bigint UNSIGNED NOT NULL,
   `producto_id` bigint UNSIGNED NOT NULL,
-  `detalle_ingreso_id` varchar(244) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `lotes_cantidad` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `lotes_kilos` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `detalle_ingreso_id` varchar(244) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `lotes_cantidad` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `lotes_kilos` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `cantidad_kilos` double NOT NULL,
   `cantidad` double NOT NULL,
   `monto` decimal(24,2) NOT NULL,

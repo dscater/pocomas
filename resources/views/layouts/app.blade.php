@@ -386,7 +386,7 @@
                         console.log("sesion actualizada");
                     },
                     error: function(e) {
-                        window.location.reload();
+                        // window.location.reload();
                     }
                 });
             }, tiempoInactividad);

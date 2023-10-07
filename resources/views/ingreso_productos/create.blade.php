@@ -26,20 +26,17 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Nuevo Ingreso</h3>
+                    <!-- /.card-header -->
+                    {{ Form::open(['route' => 'ingreso_productos.store', 'method' => 'post']) }}
+                    @include('ingreso_productos.form.form')
+                    <div class="row">
+                        <div class="col-md-4 ml-auto mr-auto">
+                            <button class="btn btn-info btn-block" id="btnRegistrar"><i class="fa fa-save"></i>
+                                GUARDAR</button>
                         </div>
-                        <!-- /.card-header -->
-                        {{ Form::open(['route' => 'ingreso_productos.store', 'method' => 'post']) }}
-                        <div class="card-body">
-                            @include('ingreso_productos.form.form')
-
-                            <button class="btn btn-info" id="btnRegistrar"><i class="fa fa-save"></i> GUARDAR</button>
-                        </div>
-                        {{ Form::close() }}
-                        <!-- /.card-body -->
                     </div>
+                    {{ Form::close() }}
+                    <!-- /.card-body -->
                     <!-- /.card -->
                 </div>
                 <!-- /.col -->
@@ -47,7 +44,21 @@
             <!-- /.row -->
         </div>
     </section>
+    <input type="hidden" id="urlInfoIngresoProducto"value="{{ route('lote_productos.getInfoParaRegistroIngreso') }}">
 @endsection
 @section('scripts')
+    <script>
+        @if (session('bien'))
+            mensajeNotificacion('{{ session('bien') }}', 'success');
+        @endif
+
+        @if (session('info'))
+            mensajeNotificacion('{{ session('info') }}', 'info');
+        @endif
+
+        @if (session('error'))
+            mensajeNotificacion('{{ session('error') }}', 'error');
+        @endif
+    </script>
     <script src="{{ asset('js/ingreso_productos/create.js') }}"></script>
 @endsection

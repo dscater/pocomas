@@ -22,14 +22,6 @@ class ProductoController extends Controller
 
     public function store(Request $request)
     {
-        $prioridad = $request->prioridad;
-        if ($prioridad == 'PRINCIPAL') {
-            $existe = Producto::where("prioridad", "PRINCIPAL")->where("status", 1)->get()->first();
-            if ($existe) {
-                return redirect()->route('productos.index')->with('error', 'No se pudo realizar el registro, debido a que ya existe un Producto con prioridad PRINCIPAL');
-            }
-        }
-
         $request['fecha_registro'] = date('Y-m-d');
         $request['stock_actual'] = 0;
         $request['stock_actual_cantidad'] = 0;
@@ -57,14 +49,6 @@ class ProductoController extends Controller
 
     public function update(Producto $producto, Request $request)
     {
-        $prioridad = $request->prioridad;
-        if ($prioridad == 'PRINCIPAL') {
-            $existe = Producto::where("prioridad", "PRINCIPAL")->where("status", 1)->where("id", "!=", $producto->id)->get()->first();
-            if ($existe) {
-                return redirect()->route('productos.index')->with('error', 'No se pudo actualizar el registro, debido a que ya existe un Producto con prioridad PRINCIPAL');
-            }
-        }
-
         $producto->update(array_map('mb_strtoupper', $request->except('foto')));
         if ($request->hasFile('foto')) {
             // antiguo
@@ -99,23 +83,23 @@ class ProductoController extends Controller
     public function getInfoVenta(Request $request)
     {
         $ingreso_producto_id = $request->ingreso_producto_id;
+        $ingreso_producto = IngresoProducto::find($ingreso_producto_id);
         $producto_id = $request->producto_id;
         $producto_venta = Producto::find($producto_id);
         $producto_info = Producto::find($producto_id);
-        $stock_actual = $producto_info->stock_actual;
-        $stock_actual_cantidad = $producto_info->stock_actual_cantidad;
 
-        if ($producto_venta->prioridad == 'PRINCIPAL' || $producto_venta->prioridad == 'DEL PRINCIPAL') {
-            $producto_info = Producto::where("prioridad", "PRINCIPAL")->where("status", 1)->get()->first();
-            if ($producto_info) {
-                $stock_actual = $producto_info->stock_actual;
-                $stock_actual_cantidad = $producto_info->stock_actual_cantidad;
-            }
-        }
+        // sum stock por lote
+        $total_kilos_disponible = DetalleIngreso::where("ingreso_producto_id", $ingreso_producto_id)
+            ->where("producto_id", $producto_id)->sum("stock_kilos");
+        $total_cantidad_disponible = DetalleIngreso::where("ingreso_producto_id", $ingreso_producto_id)
+            ->where("producto_id", $producto_id)->sum("stock_cantidad");
+
+        // cantidades requeridas
         $cantidad = $request->cantidad;
         $cantidad_kilos = $request->cantidad_kilos;
 
-        if ($stock_actual_cantidad >= $cantidad && $stock_actual >= $cantidad_kilos) {
+        // validar stock
+        if ($total_cantidad_disponible >= $cantidad && $total_kilos_disponible >= $cantidad_kilos) {
             $array_lotes = IngresoProducto::getProductosLote($producto_info->id, $ingreso_producto_id, $cantidad_kilos, $cantidad);
 
             if (count($array_lotes["ids"]) > 0) {
@@ -137,7 +121,7 @@ class ProductoController extends Controller
         } else {
             return response()->JSON([
                 'sw' => false,
-                'msg' => 'El stock actual en el lote del producto que seleccionó es de:<br> <p class="text-center mb-1"><strong>' . $stock_actual . ' kilos</strong> | <strong>' . $stock_actual_cantidad . ' cerdos</strong></p>Insuficiente para las cantidades que seleccionó',
+                'msg' => 'El stock actual del producto ' . $producto_info->nombre . ', en el lote nro. ' . $ingreso_producto->nro_lote . ' es de:<br> <p class="text-center mb-1"><strong>Kilos: ' . $total_kilos_disponible . '</strong> | <strong>Cantidad: ' . $total_cantidad_disponible . '</strong></p>Insuficiente para las cantidades que seleccionó',
             ]);
         }
     }

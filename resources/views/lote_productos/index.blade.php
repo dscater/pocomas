@@ -1,15 +1,6 @@
 @extends('layouts.app')
 
 @section('css')
-    <style>
-        .limite {
-            background: rgb(245, 114, 114);
-        }
-
-        .limite:hover {
-            background: rgb(245, 114, 114) !important;
-        }
-    </style>
 @endsection
 
 @section('content')
@@ -17,12 +8,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0 text-dark">Productos</h1>
+                    <h1 class="m-0 text-dark">Lotes de Productos</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('home') }}">Inicio</a></li>
-                        <li class="breadcrumb-item active">Productos</li>
+                        <li class="breadcrumb-item active">Ingresos Productos</li>
                     </ol>
                 </div>
             </div>
@@ -36,7 +27,7 @@
                     <div class="card">
                         <div class="card-header">
                             {{-- <h3 class="card-title"></h3> --}}
-                            <a href="{{ route('productos.create') }}" class="btn btn-info"><i class="fa fa-plus"></i>
+                            <a href="{{ route('lote_productos.create') }}" class="btn btn-info"><i class="fa fa-plus"></i>
                                 Nuevo</a>
                         </div>
                         <!-- /.card-header -->
@@ -44,17 +35,14 @@
                             <table id="example2" class="table data-table table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Nº</th>
-                                        <th>Foto</th>
-                                        <th>Código</th>
-                                        <th>Nombre</th>
+                                        <th>Fecha Ingreso</th>
+                                        <th>Nro. Lote</th>
+                                        <th>Proveedor</th>
+                                        <th>Producto</th>
+                                        <th>Precio Total</th>
+                                        <th>Kilos de Cerdo</th>
+                                        <th>Cantidad de Cerdos</th>
                                         <th>Descripción</th>
-                                        <th>Stock Mínimo</th>
-                                        <th>Stock Actual Kilos</th>
-                                        <th>Stock Actual Cantidad</th>
-                                        <th>Precio de Venta</th>
-                                        <th>Fecha Registro</th>
-                                        <th>Estado</th>
                                         <th>Opciones</th>
                                     </tr>
                                 </thead>
@@ -62,34 +50,25 @@
                                     @php
                                         $cont = 1;
                                     @endphp
-                                    @foreach ($productos as $producto)
-                                        @php
-                                            $limite = '';
-                                            if ($producto->stock_actual <= $producto->stock_minimo) {
-                                                $limite = 'limite';
-                                            }
-                                        @endphp
-                                        <tr class="{{ $limite }}">
-                                            <td>{{ $cont++ }}</td>
-                                            <td class="text-center"><img
-                                                    src="{{ asset('imgs/productos/' . $producto->foto) }}" alt="Imagen"
-                                                    style="height:50px;width:50px;"></td>
-                                            <td>{{ $producto->codigo }}</td>
-                                            <td>{{ $producto->nombre }}</td>
-                                            <td>{{ $producto->descripcion }}</td>
-                                            <td>{{ $producto->stock_minimo }}</td>
-                                            <td>{{ $producto->stock_actual }}</td>
-                                            <td>{{ $producto->stock_actual_cantidad }}</td>
-                                            <td>{{ $producto->precio }}</td>
-                                            <td>{{ $producto->fecha_registro }}</td>
-                                            <td>{{ $producto->estado }}</td>
+                                    @foreach ($ingreso_productos as $ingreso_producto)
+                                        <tr>
+                                            <td>{{ $ingreso_producto->fecha_ingreso }}</td>
+                                            <td>{{ $ingreso_producto->nro_lote }}</td>
+                                            <td>{{ $ingreso_producto->proveedor->razon_social }}</td>
+                                            <td>{{ $ingreso_producto->producto->nombre }}
+                                            </td>
+                                            <td>{{ $ingreso_producto->precio_total }}</td>
+                                            <td>{{ $ingreso_producto->total_kilos }}</td>
+                                            <td>{{ $ingreso_producto->total_cantidad }}</td>
+                                            <td>{{ $ingreso_producto->descripcion }}</td>
                                             <td class="btns-opciones">
-                                                <a href="{{ route('productos.edit', $producto->id) }}" class="modificar"><i
-                                                        class="fa fa-edit" data-toggle="tooltip" data-placement="left"
-                                                        title="Modificar"></i></a>
-                                                @if (Auth::user()->tipo == 'ADMINISTRADOR')
+                                                @if (Auth::user()->tipo == 'ADMINISTRADOR' && !$ingreso_producto->existe_ventas && !$ingreso_producto->existe_pagos)
+                                                    <a href="{{ route('lote_productos.edit', $ingreso_producto->id) }}"
+                                                        class="modificar"><i class="fa fa-edit" data-toggle="tooltip"
+                                                            data-placement="left" title="Modificar"></i></a>
+
                                                     <a href="#"
-                                                        data-url="{{ route('productos.destroy', $producto->id) }}"
+                                                        data-url="{{ route('lote_productos.destroy', $ingreso_producto->id) }}"
                                                         data-toggle="modal" data-target="#modal-eliminar"
                                                         class="eliminar"><i class="fa fa-trash" data-toggle="tooltip"
                                                             data-placement="left" title="Eliminar"></i></a>
@@ -126,7 +105,11 @@
             mensajeNotificacion('{{ session('error') }}', 'error');
         @endif
 
+
         $('table.data-table').DataTable({
+            order: [
+                [0, 'desc']
+            ],
             columns: [{
                     width: "5%"
                 },
@@ -134,21 +117,8 @@
                 null,
                 null,
                 null,
-                {
-                    width: "5%"
-                },
-                {
-                    width: "5%"
-                },
-                {
-                    width: "5%"
-                },
-                {
-                    width: "5%"
-                },
-                {
-                    width: "5%"
-                },
+                null,
+                null,
                 null,
                 {
                     width: "10%"
@@ -163,8 +133,9 @@
         // ELIMINAR
         $(document).on('click', 'table tbody tr td.btns-opciones a.eliminar', function(e) {
             e.preventDefault();
-            let productos = $(this).parents('tr').children('td').eq(3).text();
-            $('#mensajeEliminar').html(`¿Está seguro(a) de eliminar el registro <b>${productos}</b>?`);
+            let ingreso_productos = $(this).parents('tr').children('td').eq(1).text();
+            $('#mensajeEliminar').html(
+                `¿Está seguro(a) de eliminar lote nro.: <b>${ingreso_productos}</b>?`);
             let url = $(this).attr('data-url');
             console.log($(this).attr('data-url'));
             $('#formEliminar').prop('action', url);

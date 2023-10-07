@@ -53,20 +53,4 @@
             ) }}
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="form-group">
-            <label>Prioridad*</label>
-            {{ Form::select(
-                'prioridad',
-                [
-                    '' => 'Seleccione...',
-                    'NORMAL' => 'NORMAL',
-                    'PRINCIPAL' => 'PRINCIPAL',
-                    'DEL PRINCIPAL' => 'DEL PRINCIPAL',
-                ],
-                null,
-                ['class' => 'form-control', 'required'],
-            ) }}
-        </div>
-    </div>
 </div>

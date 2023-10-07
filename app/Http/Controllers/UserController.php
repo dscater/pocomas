@@ -36,9 +36,12 @@ class UserController extends Controller
     public function inactividad(Request $request)
     {
         $user = Auth::user();
-        $user->sesion_user->update(["estado" => 0]);
-        $user->sesion_user->update(["estado" => 1]);
-        return response()->JSON(true);
+        if ($user && $user->session_user) {
+            $user->sesion_user->update(["estado" => 0]);
+            $user->sesion_user->update(["estado" => 1]);
+            return response()->JSON(true);
+        }
+        return response()->JSON(false);
     }
 
 

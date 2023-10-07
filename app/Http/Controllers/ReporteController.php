@@ -950,6 +950,7 @@ class ReporteController extends Controller
             ->join("ventas", "ventas.id", "=", "cuenta_cobrars.venta_id")
             ->where("ventas.cliente_id", $cliente_id)
             ->whereBetween("ventas.fecha_venta", [$fecha_ini, $fecha_fin])
+            ->whereIn("ventas.estado", [1, 2])
             ->get();
 
         $pdf = PDF::loadView('reportes.estado_cuenta_cliente', compact('cliente', 'cuentas_cobrar', "fecha_ini", "fecha_fin"))->setPaper('letter', 'portrait');

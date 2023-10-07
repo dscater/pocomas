@@ -4,8 +4,8 @@
     <style type="text/css">
         /* FACURA */
         .contenedor_factura {
-            font-size: 9pt;
-            width: 6.4cm !important;
+            font-size: 8pt;
+            width: 4.5cm !important;
             padding-top: 15px;
             padding-bottom: 15px;
             font-family: 'Times New Roman', Times, serif;
@@ -94,7 +94,7 @@
         }
 
         .cobro table tr td {
-            font-size: 0.8em;
+            font-size: 0.75em;
             word-break: break-all;
         }
 
@@ -109,7 +109,7 @@
 
         .cod_control,
         .fecha_emision {
-            font-size: 0.9em;
+            font-size: 0.8em;
         }
 
         .cobro table {
@@ -136,7 +136,7 @@
 
         .pr-10 {
             padding-right: 10px;
-            font-size: 9pt !important;
+            font-size: 8pt !important;
         }
 
         @media (max-width:800px) {
@@ -220,7 +220,7 @@
                                             </tr>
                                             @foreach ($venta->detalle as $value)
                                                 <tr>
-                                                    <td class="centreado">{{ $value->cantidad_kilos }} Kg
+                                                    <td class="centreado">{{ $value->cantidad_kilos }} Kg<br/>
                                                         ({{ $value->cantidad }} C)</td>
                                                     <td class="izquierda">{{ $value->producto->nombre }}</td>
                                                     <td class="centreado">{{ $value->monto }}</td>
@@ -296,12 +296,12 @@
                     @page { margin: 0; }
 
                     #principal{
-                        width: 6.4cm !important;
+                        width: 4.5cm !important;
                     }
 
                     #contenedor_imprimir {
-                        font-size: 9pt;
-                        width: 6.4cm !important;
+                        font-size: 8pt;
+                        width: 4.5cm !important;
                         padding-top: 15px;
                         padding-bottom: 15px;
                         font-family: 'Times New Roman', Times, serif;
@@ -309,7 +309,7 @@
 
                     .elemento {
                         text-align: center;
-                        font-size: 0.9em;
+                        font-size: 0.8em;
                     }
 
                     .elemento.logo img {
@@ -323,7 +323,7 @@
 
                     .fono,
                     .lp {
-                        font-size: 0.8em;
+                        font-size: 0.7em;
                     }
 
                     .txt_fo {
@@ -385,7 +385,7 @@
                     }
 
                     .cobro table tr td {
-                        font-size: 0.7em;
+                        font-size: 0.499em;
                         word-break: break-all;
                     }
                     .cobro table tr td:nth-child(3) {
@@ -398,7 +398,7 @@
 
                     .cod_control,
                     .fecha_emision {
-                        font-size: 0.9em;
+                        font-size: 0.7em;
                     }
 
                     .cobro table {
@@ -425,7 +425,7 @@
 
                     .pr-10 {
                         padding-right: 10px;
-                        font-size: 9pt !important;
+                        font-size: 8pt !important;
                     }
                 </style>
                 `
