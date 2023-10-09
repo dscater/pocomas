@@ -76,26 +76,6 @@ class LoteProductoController extends Controller
                 ]);
             }
 
-            // ACTUALIZAR STOCK PRODUCTO
-            $producto = Producto::find($nuevo_ingreso->producto_id);
-            $producto->stock_actual = (float)$producto->stock_actual + (float)$nuevo_ingreso->total_kilos;
-            $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad + (float)$nuevo_ingreso->total_cantidad;
-            $producto->save();
-            // ACTUALIZAR KARDEX
-            KardexProducto::registroIngresoLote($producto, $nuevo_ingreso);
-
-            // REGISTRAR EL INGRESO DEL DETALLE
-            DetalleIngreso::create([
-                'ingreso_producto_id'  => $nuevo_ingreso->id,
-                'producto_id'  => $producto->id,
-                'kilos'  => $nuevo_ingreso->total_kilos,
-                'cantidad'  => $nuevo_ingreso->total_cantidad,
-                'stock_kilos'  => $nuevo_ingreso->total_kilos,
-                'stock_cantidad'  => $nuevo_ingreso->total_cantidad,
-                'anticipo' => 0,
-                'anticipo_kilos' => 0,
-            ]);
-
             DB::commit();
             return redirect()->route('lote_productos.index')->with('bien', 'Registro realizado con éxito');
         } catch (\Exception $e) {
@@ -227,7 +207,7 @@ class LoteProductoController extends Controller
     public function getInfoParaRegistroIngreso(Request $request)
     {
         $ingreso_producto = IngresoProducto::find($request->ingreso_producto_id);
-        $productos = Producto::where('status', 1)->where("id", "!=", $ingreso_producto->producto_id)->get();
+        $productos = Producto::where('status', 1)->get();
         $principal = Producto::find($ingreso_producto->producto_id);
 
         $options = '<option value="">- Seleccione -</option>';
@@ -236,7 +216,6 @@ class LoteProductoController extends Controller
         }
 
         $detalle_ingresos = DetalleIngreso::where("ingreso_producto_id", $ingreso_producto->id)
-            ->where("producto_id", "!=", $ingreso_producto->producto_id)
             ->get();
         $html = "";
         if (count($detalle_ingresos) > 0) {

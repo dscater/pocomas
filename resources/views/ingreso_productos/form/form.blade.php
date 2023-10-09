@@ -9,14 +9,14 @@
                             @if (count($ingreso_productos) > 0 || count($ingreso_productos_vacios) > 0)
                                 <option value="">- Seleccione -</option>
                                 @if (count($ingreso_productos) > 0)
-                                    <optgroup label="Stock Principal Disponible">
+                                    <optgroup label="Nuevos lotes">
                                         @foreach ($ingreso_productos as $ip)
                                             <option value="{{ $ip->id }}">{{ $ip->nro_lote }}</option>
                                         @endforeach
                                     </optgroup>
                                 @endif
                                 @if (count($ingreso_productos_vacios) > 0)
-                                    <optgroup label="Stock Principal Vacío">
+                                    <optgroup label="Lotes anteriores">
                                         @foreach ($ingreso_productos_vacios as $ip)
                                             <option value="{{ $ip->id }}">{{ $ip->nro_lote }}</option>
                                         @endforeach
@@ -43,7 +43,7 @@
             </div>
             <div class="col-md-4 col-12 text-center">
                 <div class="row">
-                    <div class="col-12 p-1 font-weight-bold bg-danger">Lote para Ventas</div>
+                    <div class="col-12 p-1 font-weight-bold bg-danger">Total del Lote</div>
                     <div class="col-12">
                         <div class="row bg-primary">
                             <div class="col-6 p-1 text-md border border-top"><strong>Kilos: </strong><span

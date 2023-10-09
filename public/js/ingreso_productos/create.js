@@ -54,30 +54,17 @@ $(document).ready(function () {
             swal.fire({
                 title: "Error",
                 icon: "error",
-                text:
-                    "Los kilos ingresados no puede ser mayor a " +
-                    kilos_disponible,
+                html:
+                    "El total de los productos ingresados mas la cantidad que deseas ingresar superan los " +
+                    txtTotalKilos.text() +
+                    " kilos del lote<br>Los kilos disponibles que tienes para ingresar es de: " +
+                    kilos_disponible +
+                    " kilos",
                 confirmButtonText: "Aceptar",
                 confirmButtonColor: "#bd2130",
             });
         }
     });
-
-    cantidad.on("keyup change", function () {
-        let valor = $(this).val();
-        if (valor <= cantidad_disponible) {
-        } else {
-            $(this).val(cantidad_disponible);
-            swal.fire({
-                title: "Error",
-                icon: "error",
-                text: "La cantidad no puede ser mayor a " + cantidad_disponible,
-                confirmButtonText: "Aceptar",
-                confirmButtonColor: "#bd2130",
-            });
-        }
-    });
-
     contenedor_filas.on("click", "tr td.accion button", eliminaFila);
 });
 
@@ -97,8 +84,8 @@ function obteneInfoIngresoProducto() {
                 ingreso_producto = response.ingreso_producto;
                 // asignando valores
                 txtNomPrincipal.text(principal.nombre);
-                txtTotalKilos.text(ingreso_producto.saldo_kilos);
-                txtTotalCantidad.text(ingreso_producto.saldo_cantidad);
+                txtTotalKilos.text(ingreso_producto.total_kilos);
+                txtTotalCantidad.text(ingreso_producto.total_cantidad);
                 txtSaldoKilos.text(ingreso_producto.saldo_kilos);
                 inputSaldoKilos.val(ingreso_producto.saldo_kilos);
                 txtSaldoCantidad.text(ingreso_producto.saldo_cantidad);
