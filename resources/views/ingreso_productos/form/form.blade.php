@@ -61,15 +61,10 @@
                     <div class="col-12 p-1 font-weight-bold bg-danger">Disponible para Ingreso</div>
                     <div class="col-12">
                         <div class="row bg-success">
-                            <div class="col-6 p-1 text-md border border-top">
+                            <div class="col-12 p-1 text-md border border-top">
                                 <strong>Kilos: </strong>
                                 <span id="txtSaldoKilos">0</span>
                                 <input type="hidden" name="saldo_kilos" id="inputSaldoKilos"value="0">
-                            </div>
-                            <div class="col-6 p-1 text-md border border-top">
-                                <strong>Cantidad: </strong>
-                                <span id="txtSaldoCantidad">0</span>
-                                <input type="hidden" name="saldo_cantidad" id="inputSaldoCantidad"value="0">
                             </div>
                         </div>
                     </div>

@@ -57,7 +57,6 @@ class VentaController extends Controller
 
         $lotes = IngresoProducto::where('estado', 1)
             ->where("saldo_kilos", ">", 0)
-            ->where("saldo_cantidad", ">", 0)
             ->get();
         $array_clientes[''] = 'Buscar...';
         $array_lotes[''] = "Seleccione...";

@@ -143,9 +143,11 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         $user = Auth::user();
-        $user->sesion_user->update([
-            "estado" => 0,
-        ]);
+        if ($user->session_user) {
+            $user->sesion_user->update([
+                "estado" => 0,
+            ]);
+        }
 
         $this->guard()->logout();
 

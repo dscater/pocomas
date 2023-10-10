@@ -42,14 +42,11 @@ class IngresoProductoController extends Controller
 
         $ingreso_productos = IngresoProducto::where('estado', 1)
             ->where("saldo_kilos", ">", 0)
-            ->where("saldo_cantidad", ">", 0)
             ->get();
 
         $ingreso_productos_vacios = IngresoProducto::where('estado', 1)
             ->where("saldo_kilos", "=", 0)
-            ->orWhere("saldo_cantidad", "=", 0)
             ->get();
-
 
         return view('ingreso_productos.create', compact('array_productos', 'array_proveedors', 'ingreso_productos', 'ingreso_productos_vacios'));
     }
@@ -286,6 +283,8 @@ class IngresoProductoController extends Controller
         }
         return response()->JSON([
             "html" => $html,
+            "producto_principal" => $producto_principal,
+            "html_principal" => '<option value="' . $producto_principal->id . '">' . $producto_principal->nombre
         ]);
     }
 }

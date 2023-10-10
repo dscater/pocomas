@@ -44,7 +44,8 @@
             </div>
             <!-- /.row -->
         </div>
-        <input type="hidden" value="{{ route('ingreso_productos.getProductosLote') }}" id="url_productos_lote">
+        <input type="hidden" value="{{ route('ingreso_productos.getProductosLoteSumado') }}?stock=true"
+            id="url_productos_lote">
     </section>
 @endsection
 
@@ -65,8 +66,8 @@
                     },
                     dataType: "json",
                     success: function(response) {
-                        producto_id.html(response.html);
-                        producto_id.val('{{ $merma->producto_id }}');
+                        producto_id.html(response.html_principal);
+                        producto_id.val('{{ $merma->detalle_ingreso->producto_id }}');
                     }
                 });
             } else {

@@ -16,8 +16,6 @@ let txtTotalKilos = $("#txtTotalKilos");
 let txtTotalCantidad = $("#txtTotalCantidad");
 let txtSaldoKilos = $("#txtSaldoKilos");
 let inputSaldoKilos = $("#inputSaldoKilos");
-let txtSaldoCantidad = $("#txtSaldoCantidad");
-let inputSaldoCantidad = $("#inputSaldoCantidad");
 
 let kilos_disponible = 0;
 let cantidad_disponible = 0;
@@ -88,8 +86,6 @@ function obteneInfoIngresoProducto() {
                 txtTotalCantidad.text(ingreso_producto.total_cantidad);
                 txtSaldoKilos.text(ingreso_producto.saldo_kilos);
                 inputSaldoKilos.val(ingreso_producto.saldo_kilos);
-                txtSaldoCantidad.text(ingreso_producto.saldo_cantidad);
-                inputSaldoCantidad.val(ingreso_producto.saldo_cantidad);
 
                 kilos_disponible = parseFloat(ingreso_producto.saldo_kilos);
                 cantidad_disponible = parseFloat(
@@ -128,8 +124,6 @@ function obteneInfoIngresoProducto() {
         txtTotalCantidad.text("0");
         txtSaldoKilos.text("0");
         inputSaldoKilos.val("0");
-        txtSaldoCantidad.text("0");
-        inputSaldoCantidad.val("0");
         vaciarFilas();
     }
 }
@@ -193,8 +187,6 @@ function calculaTotal() {
 
         txtSaldoKilos.text(kilos_disponible);
         inputSaldoKilos.val(kilos_disponible);
-        txtSaldoCantidad.text(cantidad_disponible);
-        inputSaldoCantidad.val(cantidad_disponible);
     } else {
         total_kilos.children("span").text("0");
         total_kilos.children("input").val("0");
@@ -213,8 +205,6 @@ function calculaTotal() {
         );
         txtSaldoKilos.text(kilos_disponible);
         inputSaldoKilos.val(kilos_disponible);
-        txtSaldoCantidad.text(cantidad_disponible);
-        inputSaldoCantidad.val(cantidad_disponible);
     }
 }
 

@@ -66,7 +66,7 @@
                     },
                     dataType: "json",
                     success: function(response) {
-                        producto_id.html(response.html);
+                        producto_id.html(response.html_principal);
                     }
                 });
             } else {
