@@ -59,7 +59,8 @@ class LoteProductoController extends Controller
             $request['saldo_kilos'] = $request->total_kilos;
             $request['saldo_cantidad'] = $request->total_cantidad;
             // montos
-            $request['precio_total'] = $request->precio_compra;
+            $request['precio_total'] = (float)$request->precio_compra * (float)$request->total_kilos;
+            $request['precio_total'] = number_format($request['precio_total'], 2, ".", "");
             $request['saldo'] = $request->precio_total;
             if ($request->tipo == 'AL CONTADO') {
                 $request['saldo'] = 0;
@@ -144,7 +145,8 @@ class LoteProductoController extends Controller
             }
 
             // montos
-            $request['precio_total'] = $request->precio_compra;
+            $request['precio_total'] = (float)$request->precio_compra * (float)$request->total_kilos;
+            $request['precio_total'] = number_format($request['precio_total'], 2, ".", "");
             $request['saldo'] = $request->precio_total;
             if ($request->tipo == 'AL CONTADO') {
                 $request['saldo'] = 0;

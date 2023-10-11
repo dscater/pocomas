@@ -66,7 +66,7 @@
                     },
                     dataType: "json",
                     success: function(response) {
-                        producto_id.html(response.html_principal);
+                        producto_id.html(response.html);
                         producto_id.val('{{ $merma->detalle_ingreso->producto_id }}');
                     }
                 });

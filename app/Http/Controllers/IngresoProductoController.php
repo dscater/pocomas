@@ -16,8 +16,15 @@ use Illuminate\Support\Facades\DB;
 
 class IngresoProductoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        if ($request->ajax()) {
+            $ingreso_productos = IngresoProducto::where('estado', 1)->orderBy("id", "desc")->paginate(10);
+            $html = view("ingreso_productos.parcial.lista_ingresos", compact("ingreso_productos"))->render();
+            return response()->JSON([
+                "html" => $html,
+            ]);
+        }
         return redirect()->route("ingreso_productos.create");
         $ingreso_productos = IngresoProducto::where('estado', 1)->get();
         return view('ingreso_productos.index', compact('ingreso_productos'));

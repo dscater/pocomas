@@ -39,8 +39,9 @@
                                         <th>Nro. Lote</th>
                                         <th>Proveedor</th>
                                         <th>Producto</th>
-                                        <th>Precio Total</th>
+                                        <th>Precio Compra</th>
                                         <th>Kilos de Cerdo</th>
+                                        <th>Precio Total</th>
                                         <th>Cantidad de Cerdos</th>
                                         <th>Descripción</th>
                                         <th>Opciones</th>
@@ -57,8 +58,9 @@
                                             <td>{{ $ingreso_producto->proveedor->razon_social }}</td>
                                             <td>{{ $ingreso_producto->producto->nombre }}
                                             </td>
-                                            <td>{{ $ingreso_producto->precio_total }}</td>
+                                            <td>{{ $ingreso_producto->precio_compra }}</td>
                                             <td>{{ $ingreso_producto->total_kilos }}</td>
+                                            <td>{{ $ingreso_producto->precio_total }}</td>
                                             <td>{{ $ingreso_producto->total_cantidad }}</td>
                                             <td>{{ $ingreso_producto->descripcion }}</td>
                                             <td class="btns-opciones">
@@ -113,6 +115,7 @@
             columns: [{
                     width: "5%"
                 },
+                null,
                 null,
                 null,
                 null,

@@ -53,6 +53,7 @@
                                         <th>Stock Actual Kilos</th>
                                         <th>Stock Actual Cantidad</th>
                                         <th>Precio de Venta</th>
+                                        <th>Tipo de Venta</th>
                                         <th>Fecha Registro</th>
                                         <th>Estado</th>
                                         <th>Opciones</th>
@@ -81,6 +82,7 @@
                                             <td>{{ $producto->stock_actual }}</td>
                                             <td>{{ $producto->stock_actual_cantidad }}</td>
                                             <td>{{ $producto->precio }}</td>
+                                            <td>{{ $producto->tipo_venta }}</td>
                                             <td>{{ $producto->fecha_registro }}</td>
                                             <td>{{ $producto->estado }}</td>
                                             <td class="btns-opciones">
@@ -134,6 +136,9 @@
                 null,
                 null,
                 null,
+                {
+                    width: "5%"
+                },
                 {
                     width: "5%"
                 },

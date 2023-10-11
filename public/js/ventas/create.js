@@ -322,10 +322,19 @@ $(document).ready(function () {
                             .val(input_cantidad.val());
 
                         // obtener el total S/D
-                        let precio_total = (
-                            parseFloat(precio) *
-                            parseFloat(input_cantidad_kilos.val())
-                        ).toFixed(2);
+                        let precio_total = "0.00";
+                        // validar tipo_venta(PRODUCTOS)
+                        if (producto.tipo_venta == "KILOS") {
+                            precio_total = (
+                                parseFloat(precio) *
+                                parseFloat(input_cantidad_kilos.val())
+                            ).toFixed(2);
+                        } else {
+                            precio_total = (
+                                parseFloat(precio) *
+                                parseFloat(input_cantidad.val())
+                            ).toFixed(2);
+                        }
                         nueva_fila
                             .children("td")
                             .eq(5)

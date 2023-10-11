@@ -24,6 +24,7 @@ let cantidad_disponible = 0;
 let contenedor_filas = $("#contenedor_filas");
 let btnAgregar = $("#btnAgregar");
 let btnRegistrar = $("#btnRegistrar");
+let btnCancelar = $("#btnCancelar");
 
 let producto_id = $("#producto_id");
 let kilos = $("#kilos");
@@ -36,13 +37,54 @@ let eliminados = $("#eliminados");
 let principal = null;
 let ingreso_producto = null;
 $(document).ready(function () {
-    $(".contenedor_productos").hide();
+    ocultaContenedorProductos();
+
+    // ENTERS INPUTS
+    $(document).on("keypress", ".contenedor_productos input", function (e) {
+        if (e.keyCode == 13) {
+            agregarProducto();
+            e.preventDefault();
+        }
+    });
+
+    // BOTONES REGISTRAR Y CANCELAR
     btnRegistrar.hide();
+    btnCancelar.hide();
+
+    // OBTENER INFO DEL INGRESO DE PRODUCTO SELECCIONADO
     obteneInfoIngresoProducto();
-    ingreso_producto_id.change(obteneInfoIngresoProducto);
+
+    ingreso_producto_id.change(function () {
+        if ($(this).val() != "") {
+            obteneInfoIngresoProducto();
+        } else {
+            ocultaContenedorProductos();
+            btnRegistrar.hide();
+            btnCancelar.hide();
+            producto_id.html("");
+            principal = null;
+            txtNomPrincipal.text("- Seleccione un lote -");
+            kilos_disponible = 0;
+            cantidad_disponible = 0;
+            // asignando valores
+            txtNomPrincipal.text("-");
+            txtTotalKilos.text("0");
+            txtTotalCantidad.text("0");
+            txtSaldoKilos.text("0");
+            inputSaldoKilos.val("0");
+            vaciarFilas();
+        }
+    });
     validaFilas();
     calculaTotal();
     btnAgregar.click(agregarProducto);
+    btnCancelar.click(function () {
+        console.log("AA");
+        ingreso_producto_id.val("");
+        ingreso_producto_id.trigger("change");
+        ocultaContenedorProductos();
+        console.log("Ab");
+    });
 
     kilos.on("keyup change", function () {
         let valor = $(this).val();
@@ -100,19 +142,22 @@ function obteneInfoIngresoProducto() {
                     ingreso_producto.existe_ventas ||
                     ingreso_producto.existe_pagos
                 ) {
-                    $(document).find(".contenedor_productos").eq(0).hide();
+                    ocultaContenedorAgregarProducto();
                     btnRegistrar.hide();
                 } else {
-                    $(document).find(".contenedor_productos").eq(0).show();
                     btnRegistrar.show();
+                    btnCancelar.show();
                 }
+                muestraContenedorProductos();
             },
         });
-        $(".contenedor_productos").show();
+        muestraContenedorProductos();
         btnRegistrar.show();
+        btnCancelar.show();
     } else {
-        $(".contenedor_productos").hide();
+        ocultaContenedorProductos();
         btnRegistrar.hide();
+        btnCancelar.hide();
         producto_id.html("");
         principal = null;
         txtNomPrincipal.text("- Seleccione un lote -");
@@ -287,4 +332,44 @@ function vaciarFilas() {
         $(this).remove();
     });
     validaFilas();
+}
+
+function muestraContenedorProductos() {
+    let contenedores = $(document).find(".contenedor_productos");
+    contenedores.each(function () {
+        let elem = $(this);
+        elem.removeClass("oculto");
+        elem.css(
+            "max-height",
+            $(".contenedor_productos")[0].scrollHeight + "px"
+        );
+        setTimeout(function () {
+            expandirContenedor(elem);
+        }, 100);
+    });
+}
+
+function ocultaContenedorAgregarProducto() {
+    let contenedores = $(document).find(".contenedor_productos");
+    let elem = contenedores.eq(0);
+    elem.css("max-height", "0");
+    setTimeout(function () {
+        elem.addClass("oculto");
+    }, 500);
+}
+
+function ocultaContenedorProductos() {
+    let contenedores = $(document).find(".contenedor_productos");
+    contenedores.each(function () {
+        let elem = $(this);
+        elem.css("max-height", "0");
+        setTimeout(function () {
+            elem.addClass("oculto");
+        }, 500);
+    });
+}
+
+function expandirContenedor(elem) {
+    var alturaNecesaria = elem[0].scrollHeight + "px";
+    elem.css("max-height", alturaNecesaria);
 }

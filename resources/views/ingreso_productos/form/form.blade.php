@@ -75,7 +75,7 @@
 </div>
 
 
-<div class="row contenedor_productos">
+<div class="row contenedor_productos oculto">
     <div class="col-md-12">
         <div class="card">
             <div class="card-body bg-gray">

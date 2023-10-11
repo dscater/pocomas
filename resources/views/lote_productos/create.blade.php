@@ -49,4 +49,23 @@
     </section>
 @endsection
 @section('scripts')
+    <script>
+        let precio_total = $("#precio_total");
+        let precio_compra = $("#precio_compra");
+        let kilos = $("#kilos");
+        $(document).ready(function() {
+            precio_compra.on('change keyup', getPrecioTotal);
+            kilos.on('change keyup', getPrecioTotal);
+        });
+
+        function getPrecioTotal() {
+            if (precio_compra.val() != '' && kilos.val() != '') {
+                let total = parseFloat(precio_compra.val()) * parseFloat(kilos.val());
+                total = parseFloat(total).toFixed(2);
+                precio_total.val(total);
+            } else {
+                precio_total.val('0.00');
+            }
+        }
+    </script>
 @endsection

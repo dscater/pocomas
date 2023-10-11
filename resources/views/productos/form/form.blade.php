@@ -17,13 +17,16 @@
             {{ Form::textarea('descripcion', null, ['class' => 'form-control', 'rows' => '2']) }}
         </div>
     </div>
-</div>
-
-<div class="row">
     <div class="col-md-4">
         <div class="form-group">
             <label>Precio de Venta*</label>
             {{ Form::number('precio', null, ['class' => 'form-control', 'required', 'step' => '0.01', 'min' => '0']) }}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label>Venta por*</label>
+            {{ Form::select('tipo_venta', ['' => 'seleccione...', 'KILOS' => 'KILOS', 'CANTIDAD' => 'CANTIDAD'], null, ['class' => 'form-control', 'required']) }}
         </div>
     </div>
     <div class="col-md-4">

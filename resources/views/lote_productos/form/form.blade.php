@@ -26,7 +26,7 @@
     <div class="col-md-4">
         <div class="form-group">
             <label>Kilos de cerdos*</label>
-            {{ Form::number('total_kilos', null, ['class' => 'form-control', 'step' => '0.01', 'min' => '0', 'id' => 'kilos','required']) }}
+            {{ Form::number('total_kilos', null, ['class' => 'form-control', 'step' => '0.01', 'min' => '0', 'id' => 'kilos', 'required']) }}
         </div>
     </div>
     <div class="col-md-4">
@@ -35,9 +35,6 @@
             {{ Form::text('total_cantidad', null, ['class' => 'form-control', 'id' => 'cantidad']) }}
         </div>
     </div>
-</div>
-
-<div class="row">
     <div class="col-md-4">
         <div class="form-group">
             <label>Seleccione*</label>
@@ -55,6 +52,13 @@
         <div class="form-group">
             <label>Fecha de Ingreso*</label>
             {{ Form::date('fecha_ingreso', isset($ingreso_producto) ? $ingreso_producto->fecha_ingreso : date('Y-m-d'), ['class' => 'form-control', 'required']) }}
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="form-group">
+            <label>Precio total*</label>
+            {{ Form::text('precio_total', null, ['class' => 'form-control', 'id' => 'precio_total', 'readonly']) }}
         </div>
     </div>
 </div>
