@@ -132,8 +132,8 @@ class CierreCajaController extends Controller
             ]);
 
             // VACIAR VENTAS Y CAJA
-            DB::select("UPDATE ingreso_cajas SET estado=2 WHERE caja_id=$nuevo_cierre->caja_id");
-            DB::select("UPDATE ventas SET estado=2 WHERE caja_id=$nuevo_cierre->caja_id AND saldo=0");
+            DB::select("UPDATE ingreso_cajas SET estado=2 WHERE caja_id=$nuevo_cierre->caja_id AND estado <> 0");
+            DB::select("UPDATE ventas SET estado=2 WHERE caja_id=$nuevo_cierre->caja_id AND saldo=0 AND estado <> 0");
             DB::commit();
             return redirect()->route('ingreso_cajas.index', $nuevo_cierre->caja_id)->with('bien', 'Registro realizado con éxito');
         } catch (\Exception $e) {

@@ -53,8 +53,8 @@ class Caja extends Model
     public static function getSaldo($id)
     {
         $caja = Caja::findOrFail($id);
-        $ingresos = IngresoCaja::where("tipo_movimiento", "INGRESO")->where('caja_id', $caja->id)->sum('monto_total');
-        $egresos = IngresoCaja::where("tipo_movimiento", "EGRESO")->where('caja_id', $caja->id)->sum('monto_total');
+        $ingresos = IngresoCaja::where("tipo_movimiento", "INGRESO")->where('caja_id', $caja->id)->where("estado", 1)->sum('monto_total');
+        $egresos = IngresoCaja::where("tipo_movimiento", "EGRESO")->where('caja_id', $caja->id)->where("estado", 1)->sum('monto_total');
         return (float)$ingresos - (float)$egresos;
     }
 
@@ -64,19 +64,20 @@ class Caja extends Model
         $caja = Caja::findOrFail($id);
         $ventas = IngresoCaja::select("ingreso_cajas.monto_total")
             ->join("ventas", "ventas.id", "=", "ingreso_cajas.registro_id")
-            ->where("ingreso_cajas.estado", 1)
             ->where("ingreso_cajas.tipo_movimiento", "INGRESO")
             ->whereIn("ingreso_cajas.tipo", ["ANTICIPO VENTA", "CANCELACIÓN DE ANTICIPO", "VENTA"])
             ->where('ingreso_cajas.caja_id', $caja->id)
             ->where("ventas.tipo_venta", "BANCO")
+            ->where("ingreso_cajas.estado", 1)
+            ->where("ventas.estado", 1)
             ->sum('ingreso_cajas.monto_total');
 
         $por_cobrar = IngresoCaja::select("ingreso_cajas.monto_total")
             ->join("cuenta_pagos", "cuenta_pagos.id", "=", "ingreso_cajas.registro_id")
-            ->where("ingreso_cajas.estado", 1)
             ->where("ingreso_cajas.tipo_movimiento", "INGRESO")
             ->where("ingreso_cajas.tipo", "PAGO POR COBRAR")
             ->where('ingreso_cajas.caja_id', $caja->id)
+            ->where('ingreso_cajas.estado', 1)
             ->where("cuenta_pagos.tipo_cobro", "BANCO")
             ->sum('ingreso_cajas.monto_total');
         $suma_total = (float)$ventas + (float)$por_cobrar;
@@ -90,34 +91,35 @@ class Caja extends Model
         $caja = Caja::findOrFail($id);
         $ventas = IngresoCaja::select("ingreso_cajas.monto_total")
             ->join("ventas", "ventas.id", "=", "ingreso_cajas.registro_id")
-            ->where("ingreso_cajas.estado", 1)
             ->where("ingreso_cajas.tipo_movimiento", "INGRESO")
             ->whereIn("ingreso_cajas.tipo", ["ANTICIPO VENTA", "CANCELACIÓN DE ANTICIPO", "VENTA"])
             ->where('ingreso_cajas.caja_id', $caja->id)
             ->where("ventas.tipo_venta", "!=", "BANCO")
+            ->where("ingreso_cajas.estado", 1)
+            ->where("ventas.estado", 1)
             ->sum('ingreso_cajas.monto_total');
 
         $por_cobrar = IngresoCaja::select("ingreso_cajas.monto_total")
             ->join("cuenta_pagos", "cuenta_pagos.id", "=", "ingreso_cajas.registro_id")
-            ->where("ingreso_cajas.estado", 1)
             ->where("ingreso_cajas.tipo_movimiento", "INGRESO")
             ->where("ingreso_cajas.tipo", "PAGO POR COBRAR")
             ->where('ingreso_cajas.caja_id', $caja->id)
             ->where("cuenta_pagos.tipo_cobro", "!=", "BANCO")
+            ->where('ingreso_cajas.estado', 1)
             ->sum('ingreso_cajas.monto_total');
         $suma_total = (float)$ventas + (float)$por_cobrar;
 
         $egresos = IngresoCaja::select("ingreso_cajas.monto_total")
-            ->where("ingreso_cajas.estado", 1)
             ->where("ingreso_cajas.tipo_movimiento", "EGRESO")
             ->where('ingreso_cajas.caja_id', $caja->id)
+            ->where('ingreso_cajas.estado', 1)
             ->sum('ingreso_cajas.monto_total');
 
         $ingresos = IngresoCaja::select("ingreso_cajas.monto_total")
-            ->where("ingreso_cajas.estado", 1)
             ->where("ingreso_cajas.tipo_movimiento", "INGRESO")
             ->whereNotIn("ingreso_cajas.tipo", ["ANTICIPO VENTA", "CANCELACIÓN DE ANTICIPO", "VENTA", "PAGO POR COBRAR"])
             ->where('ingreso_cajas.caja_id', $caja->id)
+            ->where('ingreso_cajas.estado', 1)
             ->sum('ingreso_cajas.monto_total');
 
         $suma_total = (float)$suma_total - (float)$egresos + $ingresos;
@@ -129,8 +131,8 @@ class Caja extends Model
     public static function getSaldoFecha($id, $fecha)
     {
         $caja = Caja::findOrFail($id);
-        $ingresos = IngresoCaja::where("tipo_movimiento", "INGRESO")->where('caja_id', $caja->id)->where('fecha', $fecha)->sum('monto_total');
-        $egresos = IngresoCaja::where("tipo_movimiento", "EGRESO")->where('caja_id', $caja->id)->where('fecha', $fecha)->sum('monto_total');
+        $ingresos = IngresoCaja::where("tipo_movimiento", "INGRESO")->where('caja_id', $caja->id)->where("estado", 1)->where('fecha', $fecha)->sum('monto_total');
+        $egresos = IngresoCaja::where("tipo_movimiento", "EGRESO")->where('caja_id', $caja->id)->where("estado", 1)->where('fecha', $fecha)->sum('monto_total');
         return (float)$ingresos - (float)$egresos;
     }
 }
