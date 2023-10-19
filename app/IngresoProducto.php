@@ -14,7 +14,21 @@ class IngresoProducto extends Model
         'fecha_ingreso', 'fecha_registro', 'estado'
     ];
 
-    protected $appends = ["cantidad_anterior", "producto_principal", "existe_ventas", "existe_pagos"];
+    protected $appends = ["cantidad_anterior", "producto_principal", "existe_ventas", "existe_pagos", "kilos_venta", "cantidad_venta"];
+
+
+    public function getKilosVentaAttribute()
+    {
+        $total_kilos = DetalleIngreso::where("ingreso_producto_id", $this->id)->sum("stock_kilos");
+        return $total_kilos;
+    }
+
+    public function getCantidadVentaAttribute()
+    {
+        $total_cantidad = DetalleIngreso::where("ingreso_producto_id", $this->id)->sum("stock_cantidad");
+        return $total_cantidad;
+    }
+
     public function getCantidadAnteriorAttribute()
     {
         if ($this->tipo_control == 'KILOS') {

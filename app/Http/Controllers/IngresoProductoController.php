@@ -115,7 +115,6 @@ class IngresoProductoController extends Controller
                     throw new Exception("No se pudo realizar el registro debido a que no se ingresaron productos");
                 }
             }
-            IngresoProducto::actualizaSaldoStocks($ingreso_producto->id);
             DB::commit();
             return redirect()->route('ingreso_productos.create')->with('bien', 'Registro realizado con éxito');
         } catch (\Exception $e) {

@@ -182,6 +182,15 @@ class VentaController extends Controller
 
                 for ($k = 0; $k < count($array_id_lotes); $k++) {
                     $detalle_ingreso = DetalleIngreso::find($array_id_lotes[$k]);
+
+                    // validar numeros menores a 0
+                    if ((float)$array_cantidad_kilos_lotes[$k] < 0) {
+                        $array_cantidad_kilos_lotes[$k] = (float)$array_cantidad_kilos_lotes[$k] * -1;
+                    }
+                    if ((float)$array_cantidad_lotes[$k] < 0) {
+                        $array_cantidad_kilos_lotes[$k] = (float)$array_cantidad_kilos_lotes[$k] * -1;
+                    }
+
                     if ($nueva_venta->tipo_venta != "ANTICIPOS") {
                         // stock del DETALLE DEL LOTE
                         $detalle_ingreso->stock_kilos = (float)$detalle_ingreso->stock_kilos - (float)$array_cantidad_kilos_lotes[$k];
@@ -200,8 +209,6 @@ class VentaController extends Controller
                     }
                 }
             }
-
-            IngresoProducto::actualizaSaldoStocks($detalle_ingreso->ingreso_producto->id);
 
             // registrar factura
             $nro_factura = 1;
@@ -471,7 +478,6 @@ class VentaController extends Controller
                         ]);
                     }
                 }
-                IngresoProducto::actualizaSaldoStocks($detalle_ingreso->ingreso_producto->id);
             }
 
             if ($venta->cuenta_cobrar) {

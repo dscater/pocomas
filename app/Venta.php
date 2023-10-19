@@ -177,7 +177,6 @@ class Venta extends Model
                         ]);
                     }
                 }
-                IngresoProducto::actualizaSaldoStocks($detalle_ingreso->ingreso_producto->id);
             }
 
             if ($venta->cuenta_cobrar) {

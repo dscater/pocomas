@@ -36,11 +36,11 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 text-center"><strong>Kilos disponibles: </strong><span
-                                    class="badge badge-primary text-md">{{ $ingreso_producto->saldo_kilos }}</span>
+                                    class="badge badge-primary text-md">{{ $ingreso_producto->kilos_venta }}</span>
                             </div>
                             <div class="col-md-6 text-center"><strong>Cantidad disponible:
                                 </strong><span
-                                    class="badge badge-info text-md">{{ $ingreso_producto->saldo_cantidad }}</span>
+                                    class="badge badge-info text-md">{{ $ingreso_producto->cantidad_venta }}</span>
                             </div>
                         </div>
                     </div>
