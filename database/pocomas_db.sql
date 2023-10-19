@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost:3306
--- Tiempo de generación: 07-10-2023 a las 16:52:35
+-- Tiempo de generación: 19-10-2023 a las 15:30:02
 -- Versión del servidor: 8.0.30
 -- Versión de PHP: 7.4.19
 
@@ -521,6 +521,7 @@ CREATE TABLE `productos` (
   `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `descripcion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `precio` decimal(24,2) NOT NULL,
+  `tipo_venta` varchar(155) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `stock_minimo` double NOT NULL,
   `stock_actual` double NOT NULL,
   `stock_actual_cantidad` double NOT NULL,
@@ -536,10 +537,10 @@ CREATE TABLE `productos` (
 -- Volcado de datos para la tabla `productos`
 --
 
-INSERT INTO `productos` (`id`, `codigo`, `nombre`, `descripcion`, `precio`, `stock_minimo`, `stock_actual`, `stock_actual_cantidad`, `estado`, `foto`, `fecha_registro`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'P001', 'PRODUCTO 1', 'DESC PROD. 1', 40.00, 10, 0, 0, 'ACTIVO', 'producto_default.png', '2023-10-07', 1, '2023-10-07 16:51:48', '2023-10-07 16:51:48'),
-(2, 'P002', 'PRODUCTO 2', 'P2', 30.00, 10, 0, 0, 'ACTIVO', 'producto_default.png', '2023-10-07', 1, '2023-10-07 16:51:58', '2023-10-07 16:51:58'),
-(3, 'P003', 'PRODUCTO 3', '', 30.50, 10, 0, 0, 'ACTIVO', 'producto_default.png', '2023-10-07', 1, '2023-10-07 16:52:13', '2023-10-07 16:52:13');
+INSERT INTO `productos` (`id`, `codigo`, `nombre`, `descripcion`, `precio`, `tipo_venta`, `stock_minimo`, `stock_actual`, `stock_actual_cantidad`, `estado`, `foto`, `fecha_registro`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'P001', 'PRODUCTO 1', 'DESC PROD. 1', 40.00, 'KILOS', 10, 0, 0, 'ACTIVO', 'producto_default.png', '2023-10-07', 1, '2023-10-07 16:51:48', '2023-10-18 17:33:10'),
+(2, 'P002', 'PRODUCTO 2', 'P2', 30.00, 'KILOS', 10, 0, 0, 'ACTIVO', 'producto_default.png', '2023-10-07', 1, '2023-10-07 16:51:58', '2023-10-11 15:40:24'),
+(3, 'P003', 'PRODUCTO 3', '', 30.50, 'CANTIDAD', 10, 0, 0, 'ACTIVO', 'producto_default.png', '2023-10-07', 1, '2023-10-07 16:52:13', '2023-10-11 15:33:44');
 
 -- --------------------------------------------------------
 
@@ -1046,7 +1047,7 @@ ALTER TABLE `kardex_productos`
 -- AUTO_INCREMENT de la tabla `mermas`
 --
 ALTER TABLE `mermas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `migrations`

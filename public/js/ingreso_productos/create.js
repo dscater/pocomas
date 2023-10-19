@@ -237,12 +237,7 @@ function calculaTotal() {
         // actualizando diposnible principal
         kilos_disponible = parseFloat(
             ingreso_producto
-                ? ingreso_producto.producto_principal.total_kilos
-                : "0"
-        );
-        cantidad_disponible = parseFloat(
-            ingreso_producto
-                ? ingreso_producto.producto_principal.total_cantidad
+                ? ingreso_producto.saldo_kilos
                 : "0"
         );
         txtSaldoKilos.text(kilos_disponible);
@@ -353,7 +348,7 @@ function ocultaContenedorAgregarProducto() {
     elem.css("max-height", "0");
     setTimeout(function () {
         elem.addClass("oculto");
-    }, 500);
+    }, 10);
 }
 
 function ocultaContenedorProductos() {

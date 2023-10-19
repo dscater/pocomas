@@ -7,7 +7,7 @@
             <td><span>{{ $di->cantidad }}</span></td>
             <td class="accion">
                 @if (!$di->ingreso_producto->existe_ventas && !$di->ingreso_producto->existe_pagos)
-                    <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                    {{-- <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button> --}}
                 @endif
             </td>
         </tr>

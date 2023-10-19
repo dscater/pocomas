@@ -56,7 +56,6 @@ class VentaController extends Controller
         $clientes = Cliente::where('estado', 1)->get();
 
         $lotes = IngresoProducto::where('estado', 1)
-            ->where("saldo_kilos", ">", 0)
             ->get();
         $array_clientes[''] = 'Buscar...';
         $array_lotes[''] = "Seleccione...";
@@ -65,7 +64,9 @@ class VentaController extends Controller
             $array_clientes[$value->id] = $value->nombre;
         }
         foreach ($lotes as $value) {
-            $array_lotes[$value->id] =  $value->nro_lote;
+            if ((float)$value->kilos_venta > 0) {
+                $array_lotes[$value->id] =  $value->nro_lote;
+            }
         }
 
         $conceptos = Concepto::all();
