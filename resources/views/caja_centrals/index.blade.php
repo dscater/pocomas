@@ -78,10 +78,12 @@
                                             <td>{{ $caja_central->tipo_transaccion }}</td>
                                             <td>{{ date('d/m/Y', strtotime($caja_central->fecha_registro)) }}</td>
                                             <td class="btns-opciones">
-                                                <a href="{{ route('caja_centrals.edit', $caja_central->id) }}"
-                                                    class="modificar"><i class="fa fa-edit" data-toggle="tooltip"
-                                                        data-placement="left" title="Modificar"></i></a>
-                                                @if (Auth::user()->tipo == 'ADMINISTRADOR')
+                                                @if ($caja_central->modificable)
+                                                    <a href="{{ route('caja_centrals.edit', $caja_central->id) }}"
+                                                        class="modificar"><i class="fa fa-edit" data-toggle="tooltip"
+                                                            data-placement="left" title="Modificar"></i></a>
+                                                @endif
+                                                @if (Auth::user()->tipo == 'ADMINISTRADOR' && $caja_central->modificable)
                                                     <a href="#"
                                                         data-url="{{ route('caja_centrals.destroy', $caja_central->id) }}"
                                                         data-toggle="modal" data-target="#modal-eliminar"

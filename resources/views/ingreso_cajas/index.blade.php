@@ -98,7 +98,7 @@
                                                         class="evaluar"><i class="fa fa-eye" data-toggle="tooltip"
                                                             data-placement="left" title="Ver detalle"></i></a>
 
-                                                    @if ($ingreso_caja->estado == 1)
+                                                    @if ($ingreso_caja->estado == 1 && $ingreso_caja->sin_confirmar_anticipo)
                                                         <a href="#"
                                                             data-url="{{ route('ingreso_cajas.destroy', $ingreso_caja->id) }}"
                                                             data-toggle="modal" data-target="#modal-eliminar"
