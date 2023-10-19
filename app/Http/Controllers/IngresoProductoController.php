@@ -83,6 +83,11 @@ class IngresoProductoController extends Controller
                     $producto->stock_actual = (float)$producto->stock_actual - (float)$detalle_ingreso->kilos;
                     $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad - (float)$detalle_ingreso->cantidad;
                     $producto->save();
+
+                    // AUMENTAR DEL SALDO DE KILOS PARA EL INGRESO
+                    $ingreso_producto->saldo_kilos = (float)$ingreso_producto->saldo_kilos + (float)$detalle_ingreso->kilos;
+                    $ingreso_producto->save();
+
                     // registrar egreso
                     KardexProducto::registroEgreso($producto, $detalle_ingreso->kilos, $detalle_ingreso->id, "EGRESO POR MODIFICACIÓN DE INGRESOS LOTE N° " . $detalle_ingreso->ingreso_producto->nro_lote);
                     $detalle_ingreso->delete();
@@ -96,6 +101,10 @@ class IngresoProductoController extends Controller
                     $producto->stock_actual = (float)$producto->stock_actual + (float)$kilos[$i];
                     $producto->stock_actual_cantidad = (float)$producto->stock_actual_cantidad + (float)$cantidades[$i];
                     $producto->save();
+
+                    // RESTAR DEL SALDO DE KILOS PARA EL INGRESO
+                    $ingreso_producto->saldo_kilos = (float)$ingreso_producto->saldo_kilos - (float)$kilos[$i];
+                    $ingreso_producto->save();
 
                     // REGISTRAR EL INGRESO DEL DETALLE
                     $detalle_ingreso = DetalleIngreso::create([
@@ -115,6 +124,7 @@ class IngresoProductoController extends Controller
                     throw new Exception("No se pudo realizar el registro debido a que no se ingresaron productos");
                 }
             }
+
             DB::commit();
             return redirect()->route('ingreso_productos.create')->with('bien', 'Registro realizado con éxito');
         } catch (\Exception $e) {

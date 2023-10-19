@@ -200,7 +200,6 @@ function enumeraFilas() {
 
 function calculaTotal() {
     if (validaFilas()) {
-        console.log("AA");
         let filas = contenedor_filas.children(".fila");
         let s_total_kilos = 0;
         let s_total_cantidad = 0;
@@ -222,11 +221,8 @@ function calculaTotal() {
 
         // actualizando diposnible principal
         kilos_disponible =
-            parseFloat(ingreso_producto.saldo_kilos) -
+            parseFloat(ingreso_producto.total_kilos) -
             parseFloat(s_total_kilos);
-        console.log("BB");
-        console.log(ingreso_producto.saldo_kilos);
-        console.log(s_total_kilos);
         cantidad_disponible =
             parseFloat(ingreso_producto.total_cantidad) -
             parseFloat(s_total_cantidad);
@@ -281,6 +277,7 @@ function agregarProducto() {
         calculaTotal();
         enumeraFilas();
         limpiaCampos();
+        muestraContenedorProductos();
     } else {
         swal.fire({
             title: "Error",
