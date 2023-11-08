@@ -42,7 +42,6 @@ class MermaController extends Controller
             $detalle_ingreso = DetalleIngreso::where("ingreso_producto_id", $request->ingreso_producto_id)
                 ->where("producto_id", $request->producto_id)
                 ->where("stock_kilos", ">", 0)
-                ->where("stock_cantidad", ">", 0)
                 ->get()
                 ->first();
             if (!$detalle_ingreso) {
@@ -123,7 +122,6 @@ class MermaController extends Controller
                 $detalle_ingreso = DetalleIngreso::where("ingreso_producto_id", $request->ingreso_producto_id)
                     ->where("producto_id", $request->producto_id)
                     ->where("stock_kilos", ">", 0)
-                    ->where("stock_cantidad", ">", 0)
                     ->get()
                     ->first();
                 if (!$detalle_ingreso) {
