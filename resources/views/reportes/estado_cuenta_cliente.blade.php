@@ -204,7 +204,7 @@
                         <td class="centreado">{{ $detalle->venta_detalle->producto->nombre }}</td>
                         <td class="centreado">{{ $detalle->venta_detalle->cantidad_kilos }}</td>
                         <td class="centreado">{{ $detalle->venta_detalle->cantidad }}</td>
-                        <td class="centreado">{{ $detalle->venta_detalle->producto->precio }}</td>
+                        <td class="centreado">{{ $detalle->venta_detalle->monto }}</td>
                         <td class="centreado">{{ $detalle->venta_detalle->total_sd }}</td>
                         <td class="centreado">{{ $detalle->venta_detalle->descuento }}</td>
                         <td class="centreado">{{ $detalle->venta_detalle->sub_total }}</td>
