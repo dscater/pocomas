@@ -1,13 +1,13 @@
-<div class="modal fade" id="m_consumo_semanal_clientes">
+<div class="modal fade" id="m_entrega_mb">
     <div class="modal-dialog">
         {!! Form::open([
-            'route' => 'reportes.consumo_semanal_clientes',
+            'route' => 'reportes.entrega_mb',
             'method' => 'get',
             'target' => '_blank',
         ]) !!}
         <div class="modal-content  bg-sucess">
             <div class="modal-header">
-                <h4 class="modal-title">Consumo semanal por cliente</h4>
+                <h4 class="modal-title">Entrega de menudos y biseras</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>

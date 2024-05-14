@@ -21,6 +21,7 @@ use App\DetalleIngreso;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade as PDF;
 use App\library\numero_a_letras\src\NumeroALetras;
+use App\VentaLote;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -156,7 +157,6 @@ class VentaController extends Controller
             $descuentos = $request->descuentos;
             $totales = $request->totales;
             for ($i = 0; $i < count($productos); $i++) {
-                Log::debug("for" . $i);
                 $desc = 0;
                 if (isset($descuentos[$i]) && $descuentos[$i] != "" && $descuentos[$i] != NULL) {
                     $desc  = $descuentos[$i];
@@ -183,6 +183,19 @@ class VentaController extends Controller
 
                 for ($k = 0; $k < count($array_id_lotes); $k++) {
                     $detalle_ingreso = DetalleIngreso::find($array_id_lotes[$k]);
+
+                    // NUEVO -> REGISTRAR LOTE VENTAS
+                    VentaLote::create([
+                        "ingreso_producto_id" => $detalle_ingreso->ingreso_producto_id,
+                        "detalle_ingreso_id" => $detalle_ingreso->id,
+                        "venta_detalle_id" => $nuevo_detalle_venta->id,
+                        "producto_id" => $nuevo_detalle_venta->producto_id,
+                        "cantidad_kilos" => $array_cantidad_kilos_lotes[$k],
+                        "cantidad" => $array_cantidad_lotes[$k],
+                        "precio" => $nuevo_detalle_venta->monto,
+                        "fecha" => $nueva_venta->fecha_venta
+                    ]);
+                    // FIN REGISTRO LOTE VENTAS
 
                     // validar numeros menores a 0
                     if ((float)$array_cantidad_kilos_lotes[$k] < 0) {

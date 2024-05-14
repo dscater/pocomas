@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost:3306
--- Tiempo de generación: 19-10-2023 a las 15:30:02
+-- Tiempo de generación: 14-05-2024 a las 17:25:44
 -- Versión del servidor: 8.0.30
 -- Versión de PHP: 7.4.19
 
@@ -141,7 +141,8 @@ CREATE TABLE `conceptos` (
 
 INSERT INTO `conceptos` (`id`, `nombre`, `created_at`, `updated_at`) VALUES
 (1, 'CONCEPTO 1', '2022-11-25 23:21:48', '2022-11-25 23:21:48'),
-(2, 'CONCEPTO 2', '2022-11-25 23:22:08', '2022-11-25 23:22:08');
+(2, 'CONCEPTO 2', '2022-11-25 23:22:08', '2022-11-25 23:22:08'),
+(3, 'GASTOS POR FAENEO', '2024-05-13 23:06:11', '2024-05-13 23:06:11');
 
 -- --------------------------------------------------------
 
@@ -214,6 +215,13 @@ CREATE TABLE `cuenta_pagars` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `cuenta_pagars`
+--
+
+INSERT INTO `cuenta_pagars` (`id`, `ingreso_producto_id`, `proveedor_id`, `monto_total`, `saldo`, `descripcion`, `fecha_registro`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, 111746.00, 111746.00, NULL, '2023-10-19', '2023-10-19 15:40:00', '2023-10-19 15:40:00');
 
 -- --------------------------------------------------------
 
@@ -305,6 +313,20 @@ CREATE TABLE `detalle_ingresos` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `detalle_ingresos`
+--
+
+INSERT INTO `detalle_ingresos` (`id`, `ingreso_producto_id`, `producto_id`, `kilos`, `cantidad`, `stock_kilos`, `stock_cantidad`, `anticipo`, `anticipo_kilos`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 9470, 101, 4000, 0, 0, 0, '2023-10-19 15:40:00', '2023-11-08 01:21:50'),
+(2, 1, 2, 2000, 200, 1600, 189, 0, 0, '2023-10-19 15:43:14', '2024-05-13 22:10:22'),
+(3, 1, 3, 3000, 300, 2770, 298.3, 0, 0, '2023-10-19 15:43:27', '2024-05-13 22:20:35'),
+(4, 1, 2, 4470, 400, 4470, 400, 0, 0, '2023-10-19 15:43:42', '2023-10-19 15:43:42'),
+(5, 2, 2, 2000, 200, 1700, 198, 0, 0, '2024-05-13 22:18:44', '2024-05-13 22:19:48'),
+(6, 2, 3, 300, 20, 200, 19, 0, 0, '2024-05-13 22:19:11', '2024-05-13 22:20:35'),
+(7, 2, 1, 200, 20, 180, 19, 0, 0, '2024-05-13 22:19:11', '2024-05-13 22:19:48'),
+(8, 2, 3, 50, 3, 50, 3, 0, 0, '2024-05-13 22:20:09', '2024-05-13 22:20:09');
+
 -- --------------------------------------------------------
 
 --
@@ -320,6 +342,17 @@ CREATE TABLE `facturas` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `facturas`
+--
+
+INSERT INTO `facturas` (`id`, `venta_id`, `nro_factura`, `cliente`, `nit`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 'FERNANDO MACHACA', '111', '2023-10-19 15:40:42', '2023-10-19 15:40:42'),
+(2, 2, 2, 'FELIPE GUTIERREZ', '333', '2023-10-19 15:44:31', '2023-10-19 15:44:31'),
+(3, 3, 3, 'FELIPE GUTIERREZ', '333', '2024-05-13 22:10:22', '2024-05-13 22:10:22'),
+(4, 4, 4, 'MARCOS PRADERA', '222', '2024-05-13 22:19:48', '2024-05-13 22:19:48'),
+(5, 5, 5, 'CARLOS MAMANI', '555', '2024-05-13 22:20:35', '2024-05-13 22:20:35');
 
 -- --------------------------------------------------------
 
@@ -391,6 +424,21 @@ CREATE TABLE `ingreso_cajas` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `ingreso_cajas`
+--
+
+INSERT INTO `ingreso_cajas` (`id`, `caja_id`, `inicio_caja_id`, `tipo_movimiento`, `tipo`, `registro_id`, `monto_total`, `concepto_id`, `fecha`, `hora`, `sw_egreso`, `user_id`, `estado`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 'INGRESO', 'VENTA', 1, 172600.00, 0, '2023-10-19', '11:40:42', NULL, 2, 1, '2023-10-19 15:40:42', '2023-10-19 15:40:42'),
+(2, 1, 1, 'INGRESO', 'VENTA', 2, 3000.00, 0, '2023-10-19', '11:44:31', NULL, 2, 1, '2023-10-19 15:44:31', '2023-10-19 15:44:31'),
+(3, 1, 1, 'INGRESO', 'DESC. INGRESO', 0, 500.00, 1, '2024-05-13', '11:09:46', NULL, 1, 1, '2024-05-13 15:09:46', '2024-05-13 15:09:46'),
+(4, 1, 1, 'EGRESO', 'DESC. EGRESO', 0, 400.00, 2, '2024-05-13', '11:09:55', 'GASTO', 1, 1, '2024-05-13 15:09:55', '2024-05-13 15:09:55'),
+(5, 1, 1, 'INGRESO', 'DESC.', 0, 40.00, 2, '2024-05-13', '11:10:45', NULL, 1, 1, '2024-05-13 15:10:45', '2024-05-13 15:10:45'),
+(6, 1, 1, 'INGRESO', 'VENTA', 3, 9021.35, 0, '2024-05-13', '18:10:22', NULL, 2, 1, '2024-05-13 22:10:22', '2024-05-13 22:10:22'),
+(7, 1, 1, 'INGRESO', 'VENTA', 4, 9800.00, 0, '2024-05-13', '18:19:48', NULL, 2, 1, '2024-05-13 22:19:48', '2024-05-13 22:19:48'),
+(8, 1, 1, 'INGRESO', 'VENTA', 5, 61.00, 0, '2024-05-13', '18:20:35', NULL, 2, 1, '2024-05-13 22:20:35', '2024-05-13 22:20:35'),
+(9, 1, 1, 'EGRESO', 'DESC', 0, 1200.00, 3, '2024-05-13', '19:06:23', 'GASTO', 1, 1, '2024-05-13 23:06:23', '2024-05-13 23:06:23');
+
 -- --------------------------------------------------------
 
 --
@@ -418,6 +466,14 @@ CREATE TABLE `ingreso_productos` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `ingreso_productos`
+--
+
+INSERT INTO `ingreso_productos` (`id`, `nro_lote`, `proveedor_id`, `producto_id`, `tipo`, `total_kilos`, `total_cantidad`, `saldo_kilos`, `saldo_cantidad`, `precio_total`, `descripcion`, `saldo`, `precio_compra`, `fecha_ingreso`, `fecha_registro`, `estado`, `created_at`, `updated_at`) VALUES
+(1, '111', 2, 1, 'POR PAGAR', 9470, 101, 0.00, 101.00, 111746.00, '', 111746.00, 11.80, '2023-10-19', '2023-10-19', 1, '2023-10-19 15:40:00', '2023-10-19 15:43:42'),
+(2, '2222', 2, 2, 'AL CONTADO', 2000, 200, 1450.00, 200.00, 4600000.00, '', 0.00, 2300.00, '2024-05-13', '2024-05-13', 1, '2024-05-13 22:18:44', '2024-05-13 22:20:09');
+
 -- --------------------------------------------------------
 
 --
@@ -436,6 +492,13 @@ CREATE TABLE `inicio_cajas` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `inicio_cajas`
+--
+
+INSERT INTO `inicio_cajas` (`id`, `caja_id`, `monto_inicial`, `fecha_inicio`, `descripcion`, `user_id`, `fecha_registro`, `estado`, `created_at`, `updated_at`) VALUES
+(1, 1, 0.00, '2023-10-19', 'APERTURA DE CAJA POR VENTA EN CAJA', 2, '2023-10-19', 1, '2023-10-19 15:40:42', '2023-10-19 15:40:42');
 
 -- --------------------------------------------------------
 
@@ -463,6 +526,33 @@ CREATE TABLE `kardex_productos` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `kardex_productos`
+--
+
+INSERT INTO `kardex_productos` (`id`, `producto_id`, `detalle_ingreso_id`, `modulo`, `fecha`, `detalle`, `precio`, `tipo`, `ingreso_c`, `salida_c`, `saldo_c`, `cu`, `ingreso_m`, `salida_m`, `saldo_m`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 'IngresoProducto', '2023-10-19', 'VALOR INICIAL LOTE N° 111', 11.80, 'INGRESO', 9470, NULL, 9470, 40.00, 378800.00, NULL, 378800.00, '2023-10-19 15:40:00', '2023-10-19 15:40:00'),
+(2, 1, 1, 'DetalleIngreso', '2023-10-19', 'VENTA DE PRODUCTO', NULL, 'EGRESO', NULL, 4315, 5155, 40.00, NULL, 172600.00, 206200.00, '2023-10-19 15:40:42', '2023-10-19 15:40:42'),
+(3, 2, 2, NULL, '2023-10-19', 'VALOR INICIAL', NULL, 'INGRESO', 2000, NULL, 2000, 30.00, 60000.00, NULL, 60000.00, '2023-10-19 15:43:14', '2023-10-19 15:43:14'),
+(4, 3, 3, NULL, '2023-10-19', 'VALOR INICIAL', NULL, 'INGRESO', 3000, NULL, 3000, 30.50, 91500.00, NULL, 91500.00, '2023-10-19 15:43:27', '2023-10-19 15:43:27'),
+(5, 2, 4, 'DetalleIngreso', '2023-10-19', 'COMPRA DE PRODUCTO - LOTE NRO. 111', NULL, 'INGRESO', 4470, NULL, 6470, 30.00, 134100.00, NULL, 194100.00, '2023-10-19 15:43:42', '2023-10-19 15:43:42'),
+(6, 2, 2, 'DetalleIngreso', '2023-10-19', 'VENTA DE PRODUCTO', NULL, 'EGRESO', NULL, 100, 6370, 30.00, NULL, 3000.00, 191100.00, '2023-10-19 15:44:31', '2023-10-19 15:44:31'),
+(7, 1, 0, 'DetalleIngreso', '2023-11-07', 'EGRESO DE PRODUCTO POR MERMA', NULL, 'EGRESO', NULL, 5, 5150, 40.00, NULL, 200.00, 206000.00, '2023-11-08 01:14:49', '2023-11-08 01:14:49'),
+(8, 1, 0, 'DetalleIngreso', '2023-11-07', 'EGRESO DE PRODUCTO POR MERMA', NULL, 'EGRESO', NULL, 1000, 4150, 40.00, NULL, 40000.00, 166000.00, '2023-11-08 01:19:40', '2023-11-08 01:19:40'),
+(9, 1, 0, 'DetalleIngreso', '2023-11-07', 'EGRESO DE PRODUCTO POR MERMA', NULL, 'EGRESO', NULL, 50, 4100, 40.00, NULL, 2000.00, 164000.00, '2023-11-08 01:21:02', '2023-11-08 01:21:02'),
+(10, 1, 1, 'DetalleIngreso', '2023-11-07', 'INGRESO DE PRODUCTO POR ACTUALIZACIÓN DE REGISTRO MERMA', NULL, 'INGRESO', 50, NULL, 4150, 40.00, 2000.00, NULL, 166000.00, '2023-11-08 01:21:50', '2023-11-08 01:21:50'),
+(11, 1, 0, 'DetalleIngreso', '2023-11-07', 'EGRESO DE PRODUCTO POR MERMA', NULL, 'EGRESO', NULL, 150, 4000, 40.00, NULL, 6000.00, 160000.00, '2023-11-08 01:21:50', '2023-11-08 01:21:50'),
+(12, 2, 2, 'DetalleIngreso', '2024-05-13', 'VENTA DE PRODUCTO', NULL, 'EGRESO', NULL, 300, 6070, 30.00, NULL, 9000.00, 182100.00, '2024-05-13 22:10:22', '2024-05-13 22:10:22'),
+(13, 3, 3, 'DetalleIngreso', '2024-05-13', 'VENTA DE PRODUCTO', NULL, 'EGRESO', NULL, 200, 2800, 30.50, NULL, 6100.00, 85400.00, '2024-05-13 22:10:22', '2024-05-13 22:10:22'),
+(14, 2, 2, 'IngresoProducto', '2024-05-13', 'COMPRA DE PRODUCTO - LOTE NRO. 2222', 2300.00, 'INGRESO', 2000, NULL, 8070, 30.00, 60000.00, NULL, 242100.00, '2024-05-13 22:18:44', '2024-05-13 22:18:44'),
+(15, 3, 6, 'DetalleIngreso', '2024-05-13', 'COMPRA DE PRODUCTO - LOTE NRO. 2222', NULL, 'INGRESO', 300, NULL, 3100, 30.50, 9150.00, NULL, 94550.00, '2024-05-13 22:19:11', '2024-05-13 22:19:11'),
+(16, 1, 7, 'DetalleIngreso', '2024-05-13', 'COMPRA DE PRODUCTO - LOTE NRO. 2222', NULL, 'INGRESO', 200, NULL, 4200, 40.00, 8000.00, NULL, 168000.00, '2024-05-13 22:19:11', '2024-05-13 22:19:11'),
+(17, 2, 5, 'DetalleIngreso', '2024-05-13', 'VENTA DE PRODUCTO', NULL, 'EGRESO', NULL, 300, 7770, 30.00, NULL, 9000.00, 233100.00, '2024-05-13 22:19:48', '2024-05-13 22:19:48'),
+(18, 1, 7, 'DetalleIngreso', '2024-05-13', 'VENTA DE PRODUCTO', NULL, 'EGRESO', NULL, 20, 4180, 40.00, NULL, 800.00, 167200.00, '2024-05-13 22:19:48', '2024-05-13 22:19:48'),
+(19, 3, 8, 'DetalleIngreso', '2024-05-13', 'COMPRA DE PRODUCTO - LOTE NRO. 2222', NULL, 'INGRESO', 50, NULL, 3150, 30.50, 1525.00, NULL, 96075.00, '2024-05-13 22:20:09', '2024-05-13 22:20:09'),
+(20, 3, 6, 'DetalleIngreso', '2024-05-13', 'VENTA DE PRODUCTO', NULL, 'EGRESO', NULL, 100, 3050, 30.50, NULL, 3050.00, 93025.00, '2024-05-13 22:20:35', '2024-05-13 22:20:35'),
+(21, 3, 3, 'DetalleIngreso', '2024-05-13', 'VENTA DE PRODUCTO', NULL, 'EGRESO', NULL, 30, 3020, 30.50, NULL, 915.00, 92110.00, '2024-05-13 22:20:35', '2024-05-13 22:20:35');
+
 -- --------------------------------------------------------
 
 --
@@ -479,6 +569,15 @@ CREATE TABLE `mermas` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `mermas`
+--
+
+INSERT INTO `mermas` (`id`, `detalle_ingreso_id`, `fecha`, `cantidad_kilos`, `cantidad`, `porcentaje`, `created_at`, `updated_at`) VALUES
+(2, 1, '2023-11-07', 5, 0, 0.10, '2023-11-08 01:14:49', '2023-11-08 01:14:49'),
+(3, 1, '2023-11-07', 1000, 31, 19.42, '2023-11-08 01:19:40', '2023-11-08 01:19:40'),
+(4, 1, '2023-11-07', 150, 0, 3.61, '2023-11-08 01:21:02', '2023-11-08 01:21:50');
 
 -- --------------------------------------------------------
 
@@ -519,6 +618,7 @@ CREATE TABLE `productos` (
   `id` bigint UNSIGNED NOT NULL,
   `codigo` varchar(155) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abrev` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `descripcion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `precio` decimal(24,2) NOT NULL,
   `tipo_venta` varchar(155) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -537,10 +637,10 @@ CREATE TABLE `productos` (
 -- Volcado de datos para la tabla `productos`
 --
 
-INSERT INTO `productos` (`id`, `codigo`, `nombre`, `descripcion`, `precio`, `tipo_venta`, `stock_minimo`, `stock_actual`, `stock_actual_cantidad`, `estado`, `foto`, `fecha_registro`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'P001', 'PRODUCTO 1', 'DESC PROD. 1', 40.00, 'KILOS', 10, 0, 0, 'ACTIVO', 'producto_default.png', '2023-10-07', 1, '2023-10-07 16:51:48', '2023-10-18 17:33:10'),
-(2, 'P002', 'PRODUCTO 2', 'P2', 30.00, 'KILOS', 10, 0, 0, 'ACTIVO', 'producto_default.png', '2023-10-07', 1, '2023-10-07 16:51:58', '2023-10-11 15:40:24'),
-(3, 'P003', 'PRODUCTO 3', '', 30.50, 'CANTIDAD', 10, 0, 0, 'ACTIVO', 'producto_default.png', '2023-10-07', 1, '2023-10-07 16:52:13', '2023-10-11 15:33:44');
+INSERT INTO `productos` (`id`, `codigo`, `nombre`, `abrev`, `descripcion`, `precio`, `tipo_venta`, `stock_minimo`, `stock_actual`, `stock_actual_cantidad`, `estado`, `foto`, `fecha_registro`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'P001', 'PRODUCTO 1', 'P1', 'DESC PROD. 1', 40.00, 'KILOS', 10, 4180, 19, 'ACTIVO', 'producto_default.png', '2023-10-07', 1, '2023-10-07 16:51:48', '2024-05-13 23:17:18'),
+(2, 'P002', 'PRODUCTO 2', 'P2', 'P2', 30.00, 'KILOS', 10, 7770, 787, 'ACTIVO', 'producto_default.png', '2023-10-07', 1, '2023-10-07 16:51:58', '2024-05-13 23:17:21'),
+(3, 'P003', 'PRODUCTO 3', 'P3', '', 30.50, 'CANTIDAD', 10, 3020, 320.3, 'ACTIVO', 'producto_default.png', '2023-10-07', 1, '2023-10-07 16:52:13', '2024-05-13 23:17:24');
 
 -- --------------------------------------------------------
 
@@ -617,6 +717,15 @@ CREATE TABLE `sesion_users` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `sesion_users`
+--
+
+INSERT INTO `sesion_users` (`id`, `user_id`, `navegador`, `dispositivo`, `sistema`, `detalle`, `estado`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Chrome', 'Unknown', 'Windows', 'Chrome / Windows', 1, '2023-10-19 15:51:32', '2023-11-08 01:13:18'),
+(2, 2, 'Chrome', 'Unknown', 'Windows', 'Chrome / Windows', 1, '2024-05-13 14:24:24', '2024-05-13 14:24:24'),
+(3, 3, 'Chrome', 'Unknown', 'Windows', 'Chrome / Windows', 1, '2024-05-14 17:24:29', '2024-05-14 17:24:29');
 
 -- --------------------------------------------------------
 
@@ -695,6 +804,17 @@ CREATE TABLE `ventas` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `ventas`
+--
+
+INSERT INTO `ventas` (`id`, `caja_id`, `user_id`, `cliente_id`, `cantidad_total_kilos`, `cantidad_total`, `anticipo`, `saldo`, `monto_total`, `tipo_venta`, `fecha_venta`, `hora_venta`, `monto_recibido`, `monto_cambio`, `fecha_registro`, `estado`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, 1, 4315, 70, 0.00, 0.00, 172600.00, 'AL CONTADO', '2023-10-19', '11:40:42', 172600.00, 0.00, '2023-10-19', 1, '2023-10-19 15:40:42', '2023-10-19 15:40:42'),
+(2, 1, 2, 3, 100, 10, 0.00, 0.00, 3000.00, 'AL CONTADO', '2023-10-19', '11:44:31', 3000.00, 0.00, '2023-10-19', 1, '2023-10-19 15:44:31', '2023-10-19 15:44:31'),
+(3, 1, 2, 3, 500, 1.7, 0.00, 0.00, 9021.35, 'AL CONTADO', '2024-05-13', '18:10:22', 9100.00, 78.65, '2024-05-13', 1, '2024-05-13 22:10:22', '2024-05-13 22:10:22'),
+(4, 1, 2, 4, 320, 3, 0.00, 0.00, 9800.00, 'AL CONTADO', '2024-05-13', '18:19:48', 9800.00, 0.00, '2024-05-13', 1, '2024-05-13 22:19:48', '2024-05-13 22:19:48'),
+(5, 1, 2, 2, 130, 2, 0.00, 0.00, 61.00, 'AL CONTADO', '2024-05-13', '18:20:35', 70.00, 9.00, '2024-05-13', 1, '2024-05-13 22:20:35', '2024-05-13 22:20:35');
+
 -- --------------------------------------------------------
 
 --
@@ -716,6 +836,54 @@ CREATE TABLE `venta_detalles` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `venta_detalles`
+--
+
+INSERT INTO `venta_detalles` (`id`, `venta_id`, `producto_id`, `detalle_ingreso_id`, `lotes_cantidad`, `lotes_kilos`, `cantidad_kilos`, `cantidad`, `monto`, `descuento`, `sub_total`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, '1', '70', '4315', 4315, 70, 40.00, 0.00, 172600.00, '2023-10-19 15:40:42', '2023-10-19 15:40:42'),
+(2, 2, 2, '2', '10', '100', 100, 10, 30.00, 0.00, 3000.00, '2023-10-19 15:44:31', '2023-10-19 15:44:31'),
+(3, 3, 2, '2', '1', '300', 300, 1, 30.00, 0.00, 9000.00, '2024-05-13 22:10:22', '2024-05-13 22:10:22'),
+(4, 3, 3, '3', '0.7', '200', 200, 0.7, 30.50, 0.00, 21.35, '2024-05-13 22:10:22', '2024-05-13 22:10:22'),
+(5, 4, 2, '5', '2', '300', 300, 2, 30.00, 0.00, 9000.00, '2024-05-13 22:19:48', '2024-05-13 22:19:48'),
+(6, 4, 1, '7', '1', '20', 20, 1, 40.00, 0.00, 800.00, '2024-05-13 22:19:48', '2024-05-13 22:19:48'),
+(7, 5, 3, '6', '1', '100', 100, 1, 30.50, 0.00, 30.50, '2024-05-13 22:20:35', '2024-05-13 22:20:35'),
+(8, 5, 3, '3', '1', '30', 30, 1, 30.50, 0.00, 30.50, '2024-05-13 22:20:35', '2024-05-13 22:20:35');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `venta_lotes`
+--
+
+CREATE TABLE `venta_lotes` (
+  `id` bigint UNSIGNED NOT NULL,
+  `ingreso_producto_id` bigint UNSIGNED NOT NULL,
+  `detalle_ingreso_id` bigint UNSIGNED NOT NULL,
+  `venta_detalle_id` bigint UNSIGNED NOT NULL,
+  `producto_id` bigint UNSIGNED NOT NULL,
+  `cantidad_kilos` double NOT NULL,
+  `cantidad` double NOT NULL,
+  `precio` decimal(24,2) NOT NULL,
+  `fecha` date NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `venta_lotes`
+--
+
+INSERT INTO `venta_lotes` (`id`, `ingreso_producto_id`, `detalle_ingreso_id`, `venta_detalle_id`, `producto_id`, `cantidad_kilos`, `cantidad`, `precio`, `fecha`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, 1, 4315, 70, 40.00, '2023-10-19', '2024-05-13 22:24:46', '2024-05-13 22:24:46'),
+(2, 1, 2, 2, 2, 100, 10, 30.00, '2023-10-19', '2024-05-13 22:24:46', '2024-05-13 22:24:46'),
+(3, 1, 2, 3, 2, 300, 1, 30.00, '2024-05-13', '2024-05-13 22:24:46', '2024-05-13 22:24:46'),
+(4, 1, 3, 4, 3, 200, 0.7, 30.50, '2024-05-13', '2024-05-13 22:24:46', '2024-05-13 22:24:46'),
+(5, 2, 5, 5, 2, 300, 2, 30.00, '2024-05-13', '2024-05-13 22:24:46', '2024-05-13 22:24:46'),
+(6, 2, 7, 6, 1, 20, 1, 40.00, '2024-05-13', '2024-05-13 22:24:46', '2024-05-13 22:24:46'),
+(7, 2, 6, 7, 3, 100, 1, 30.50, '2024-05-13', '2024-05-13 22:24:46', '2024-05-13 22:24:46'),
+(8, 1, 3, 8, 3, 30, 1, 30.50, '2024-05-13', '2024-05-13 22:24:46', '2024-05-13 22:24:46');
 
 --
 -- Índices para tablas volcadas
@@ -920,6 +1088,12 @@ ALTER TABLE `venta_detalles`
   ADD KEY `venta_id` (`venta_id`);
 
 --
+-- Indices de la tabla `venta_lotes`
+--
+ALTER TABLE `venta_lotes`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT de las tablas volcadas
 --
 
@@ -951,7 +1125,7 @@ ALTER TABLE `clientes`
 -- AUTO_INCREMENT de la tabla `conceptos`
 --
 ALTER TABLE `conceptos`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `cuenta_clientes`
@@ -975,7 +1149,7 @@ ALTER TABLE `cuenta_cobrar_detalles`
 -- AUTO_INCREMENT de la tabla `cuenta_pagars`
 --
 ALTER TABLE `cuenta_pagars`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `cuenta_pagar_detalles`
@@ -999,13 +1173,13 @@ ALTER TABLE `datos_usuarios`
 -- AUTO_INCREMENT de la tabla `detalle_ingresos`
 --
 ALTER TABLE `detalle_ingresos`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `facturas`
 --
 ALTER TABLE `facturas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `galerias`
@@ -1023,31 +1197,31 @@ ALTER TABLE `galeria_imagens`
 -- AUTO_INCREMENT de la tabla `ingreso_cajas`
 --
 ALTER TABLE `ingreso_cajas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `ingreso_productos`
 --
 ALTER TABLE `ingreso_productos`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `inicio_cajas`
 --
 ALTER TABLE `inicio_cajas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `kardex_productos`
 --
 ALTER TABLE `kardex_productos`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT de la tabla `mermas`
 --
 ALTER TABLE `mermas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `migrations`
@@ -1077,7 +1251,7 @@ ALTER TABLE `razon_socials`
 -- AUTO_INCREMENT de la tabla `sesion_users`
 --
 ALTER TABLE `sesion_users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `users`
@@ -1095,13 +1269,19 @@ ALTER TABLE `user_cajas`
 -- AUTO_INCREMENT de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `venta_detalles`
 --
 ALTER TABLE `venta_detalles`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT de la tabla `venta_lotes`
+--
+ALTER TABLE `venta_lotes`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Restricciones para tablas volcadas

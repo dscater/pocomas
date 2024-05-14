@@ -30,6 +30,9 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('/exposicion', 'ExposicionController@exposicion')->name('exposicion');
 
+Route::get('/venta_lotes', 'VentaLoteController@venta_lotes')->name('venta_lotes');
+
+
 Route::middleware(['auth'])->group(function () {
 
     // LOGIN
@@ -256,38 +259,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('reportes/usuarios', 'ReporteController@usuarios')->name('reportes.usuarios');
 
-    Route::get('reportes/inventario', 'ReporteController@inventario')->name('reportes.inventario');
-
-    Route::get('reportes/kardex', 'ReporteController@kardex')->name('reportes.kardex');
-
-    Route::get('reportes/ventas', 'ReporteController@ventas')->name('reportes.ventas');
-
-    Route::get('reportes/cuentas', 'ReporteController@cuentas')->name('reportes.cuentas');
-
     Route::get('reportes/grafico/g_ventas', 'ReporteController@g_ventas')->name('reportes.g_ventas');
 
     Route::get('reportes/grafico/info_ventas', 'ReporteController@info_ventas')->name('reportes.info_ventas');
 
-    Route::get('reportes/ventas_diarias_producto', 'ReporteController@ventas_diarias_producto')->name('reportes.ventas_diarias_producto');
-    Route::get('reportes/ventas_semanales_producto', 'ReporteController@ventas_semanales_producto')->name('reportes.ventas_semanales_producto');
-    Route::get('reportes/ventas_mensuales_producto', 'ReporteController@ventas_mensuales_producto')->name('reportes.ventas_mensuales_producto');
-
-    Route::get('reportes/ventas_diarias_cajas', 'ReporteController@ventas_diarias_cajas')->name('reportes.ventas_diarias_cajas');
-    Route::get('reportes/egreso_caja', 'ReporteController@egreso_caja')->name('reportes.egreso_caja');
-    Route::get('reportes/egresos_caja', 'ReporteController@egresos_caja')->name('reportes.egresos_caja');
-    Route::get('reportes/consumo_diario_clientes', 'ReporteController@consumo_diario_clientes')->name('reportes.consumo_diario_clientes');
-    Route::get('reportes/consumo_semanal_clientes', 'ReporteController@consumo_semanal_clientes')->name('reportes.consumo_semanal_clientes');
-    Route::get('reportes/consumo_mensual_clientes', 'ReporteController@consumo_mensual_clientes')->name('reportes.consumo_mensual_clientes');
-    Route::get('reportes/ventas_diarias_credito', 'ReporteController@ventas_diarias_credito')->name('reportes.ventas_diarias_credito');
-    Route::get('reportes/ventas_semanales_credito', 'ReporteController@ventas_semanales_credito')->name('reportes.ventas_semanales_credito');
-    Route::get('reportes/ventas_mensuales_credito', 'ReporteController@ventas_mensuales_credito')->name('reportes.ventas_mensuales_credito');
-    Route::get('reportes/cuentas_cobrar_fecha', 'ReporteController@cuentas_cobrar_fecha')->name('reportes.cuentas_cobrar_fecha');
-    Route::get('reportes/cuentas_cobrar_rango_fecha', 'ReporteController@cuentas_cobrar_rango_fecha')->name('reportes.cuentas_cobrar_rango_fecha');
-    Route::get('reportes/estado_cuenta_cliente', 'ReporteController@estado_cuenta_cliente')->name('reportes.estado_cuenta_cliente');
-    Route::get('reportes/detalle_inventario_producto', 'ReporteController@detalle_inventario_producto')->name('reportes.detalle_inventario_producto');
-    Route::get('reportes/cuenta_pagar', 'ReporteController@cuenta_pagar')->name('reportes.cuenta_pagar');
-    Route::get('reportes/saldo_producto', 'ReporteController@saldo_producto')->name('reportes.saldo_producto');
-    Route::get('reportes/resultado_ventas', 'ReporteController@resultado_ventas')->name('reportes.resultado_ventas');
-    Route::get('reportes/mermas', 'ReporteController@mermas')->name('reportes.mermas');
-    Route::get('reportes/descuento_ventas', 'ReporteController@descuento_ventas')->name('reportes.descuento_ventas');
+    Route::get('reportes/resultado_operacion', 'ReporteController@resultado_operacion')->name('reportes.resultado_operacion');
+    Route::get('reportes/indicadores', 'ReporteController@indicadores')->name('reportes.indicadores');
+    Route::get('reportes/entrega_mb', 'ReporteController@entrega_mb')->name('reportes.entrega_mb');
 });

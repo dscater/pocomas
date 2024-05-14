@@ -13,6 +13,12 @@
     </div>
     <div class="col-md-4">
         <div class="form-group">
+            <label>Abreviatura</label>
+            {{ Form::text('abrev', null, ['class' => 'form-control']) }}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
             <label>Descripción</label>
             {{ Form::textarea('descripcion', null, ['class' => 'form-control', 'rows' => '2']) }}
         </div>

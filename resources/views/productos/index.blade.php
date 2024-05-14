@@ -48,6 +48,7 @@
                                         <th>Foto</th>
                                         <th>Código</th>
                                         <th>Nombre</th>
+                                        <th>Abrev.</th>
                                         <th>Descripción</th>
                                         <th>Stock Mínimo</th>
                                         <th>Stock Actual Kilos</th>
@@ -77,6 +78,7 @@
                                                     style="height:50px;width:50px;"></td>
                                             <td>{{ $producto->codigo }}</td>
                                             <td>{{ $producto->nombre }}</td>
+                                            <td>{{ $producto->abrev }}</td>
                                             <td>{{ $producto->descripcion }}</td>
                                             <td>{{ $producto->stock_minimo }}</td>
                                             <td>{{ $producto->stock_actual }}</td>
@@ -132,6 +134,7 @@
             columns: [{
                     width: "5%"
                 },
+                null,
                 null,
                 null,
                 null,

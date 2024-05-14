@@ -1,19 +1,31 @@
-<div class="modal fade" id="m_resultado_ventas">
+<div class="modal fade" id="m_indicadores">
     <div class="modal-dialog">
         {!! Form::open([
-            'route' => 'reportes.resultado_ventas',
+            'route' => 'reportes.indicadores',
             'method' => 'get',
             'target' => '_blank',
         ]) !!}
         <div class="modal-content  bg-sucess">
             <div class="modal-header">
-                <h4 class="modal-title">Resultado en ventas</h4>
+                <h4 class="modal-title">Indicadores</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="row">
+
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Nro. Lote:</label>
+                            <select name="ingreso_producto_id" class="form-control">
+                                <option value="todos">TODOS</option>
+                                @foreach ($ingreso_productos as $value)
+                                    <option value="{{ $value->id }}">{{ $value->nro_lote }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="">Fecha inicial:</label>
